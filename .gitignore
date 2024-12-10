@@ -1,0 +1,11 @@
+build/
+
+.vscode/
+
+temp/*
+
+*.exe
+
+*.o
+
+*.gbdinit
