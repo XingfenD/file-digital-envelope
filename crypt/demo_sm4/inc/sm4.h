@@ -1,5 +1,5 @@
 /**
- * @file ./crypt/demo_sm4/inc/sm4.h
+ * @file ./crypt/sm4/inc/sm4.h
  * @brief state the top functions of sm4
  * @author 2022302181113
  * @version 1.0
@@ -7,8 +7,10 @@
  *
  * @copyright Copyright (c) 2024
  *
- * TODO: reconstruct the sm4 algorithm, hide the given functions from global domain
- * add padding encryption function instead
+ * TODO:reconstruct the sm4 algorithm, hide the given functions from global domain
+ *      add padding encryption function instead
+ *
+ * TODO:rename the folder of demo_sm4 to sm4
  */
 
 #ifndef SM4_H

@@ -44,11 +44,15 @@ all: $(MAIN_EXEC)
 test: INCLUDES += $(addprefix -I, $(CRYPTS_INC_DIRS)) -I$(UTILS_INC_DIR)
 test: $(TEST_EXECS)
 	@for exe in $(TEST_EXECS); do \
-		echo "Running $$exe"; \
+		echo; \
+		echo ">===================  Running $$(basename $$exe) ===================<"; \
+		echo; \
 		./$$exe; \
-		echo "Finished running $$exe"; \
+		echo; \
+		echo ">=============== Finished running $$(basename $$exe) ===============<"; \
 		echo; \
 	done
+
 
 clean:
 	rm -rf build

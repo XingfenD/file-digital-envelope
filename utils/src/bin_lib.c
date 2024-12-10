@@ -1,12 +1,12 @@
 /**
- * @file ./lib/bin_lib.c
- * @brief realize the function stated in file:./inc/bin_lib.h
+ * @file ./utils/src/bin_lib.c
+ * @brief realize the functions stated in file:./utils/inc/bin_lib.h
  * @author 2022302181113
  * @version 1.0
  * @date 2024-12-02
- * 
+ *
  * @copyright Copyright (c) 2024
- * 
+ *
  * the operations related to bit operation and conversion are suggested to be defined in this file
  */
 

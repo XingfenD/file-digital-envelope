@@ -1,6 +1,16 @@
+/**
+ * @file ./test/not_compile_c
+ * @brief the demo file to show file which ends with '_c' won't be built
+ * @author 2022302181113
+ * @version 1.0
+ * @date 2024-12-10
+ *
+ * @copyright Copyright (c) 2024
+ *
+ */
 #include <debug.h>
 
 int main() {
-    debug_print("this is file:./test/not_compile_c, \n this line should not be printed without rename the file\n");
+    debug_print("this is file:./test/not_compile_c,\nthis line should not be printed without rename the file\n");
     return 0;
 }

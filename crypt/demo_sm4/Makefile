@@ -1,4 +1,4 @@
-# ./Makefile
+# ./crypt/sm4/Makefile
 
 CC = gcc
 PROJECT_ROOT = ../..

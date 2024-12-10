@@ -1,12 +1,12 @@
 /**
  * @file ./utils/inc/utils.h
- * @brief 
+ * @brief state some useful functions and macros
  * @author 2022302181113
  * @version 1.0
  * @date 2024-12-10
- * 
+ *
  * @copyright Copyright (c) 2024
- * 
+ *
  */
 
 #ifndef UTILS_H

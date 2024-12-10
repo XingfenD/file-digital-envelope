@@ -1,12 +1,12 @@
 /**
- * @file ./crypt/demo_sm4/src/sm4.c
- * @brief realize the function stated in file:./crypt/sm4/inc/sm4.h
+ * @file ./crypt/sm4/src/sm4.c
+ * @brief realize the functions stated in file:./crypt/sm4/inc/sm4.h
  * @author 2022302181113
  * @version 1.0
  * @date 2024-12-02
- * 
+ *
  * @copyright Copyright (c) 2024
- * 
+ *
  */
 
 #include <stdint.h>

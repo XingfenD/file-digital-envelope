@@ -1,12 +1,12 @@
 /**
- * @file ./inc/debug.h
+ * @file ./utils/inc/debug.h
  * @brief state some debug print functions and related macros
  * @author 2022302181113
  * @version 2.0
  * @date 2024-12-02
- * 
+ *
  * @copyright Copyright (c) 2024
- * 
+ *
  */
 
 #ifndef DEBUG_H
@@ -42,5 +42,11 @@
      * @param[in]   uint32              the uint32_t to print
      */
     void pr_uint32_hex(const uint32_t uint32);
+
+    /**
+     * @brief print a uint32_t in bin format with space as seperator every 8 bits
+     * @param[in]   uint32              the uint32_t to print
+     */
+    void pr_uint32_bin(uint32_t uint32);
 
 #endif /* !DEBUG_H */

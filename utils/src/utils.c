@@ -1,12 +1,12 @@
 /**
- * @file ./utils/inc/utils.c
- * @brief 
+ * @file ./utils/src/utils.c
+ * @brief realize the functions stated in file:./utils/inc/utils.h
  * @author 202230218113
  * @version 1.0
  * @date 2024-12-10
- * 
+ *
  * @copyright Copyright (c) 2024
- * 
+ *
  */
 
 #include <debug.h>

@@ -1,6 +1,6 @@
 /**
- * @file ./crypt/demo_sm4/src/sm4_sub.c
- * @brief realize the sub functions stated in file:./inc/aes_sub.h
+ * @file ./crypt/sm4/src/sm4_sub.c
+ * @brief realize the sub functions stated in file:./crypt/sm4/inc/sm4_sub.h
  * @author 2022302181113
  * @version 1.0
  * @date 2024-12-02

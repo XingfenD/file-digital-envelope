@@ -1,12 +1,12 @@
 /**
- * @file ./lib/debug.c
- * @brief realize the functions stated in file:./inc/debug.h
+ * @file ./utils/src/debug.c
+ * @brief realize the functions stated in file:./utils/inc/debug.h
  * @author 2022302181113
  * @version 2.0
  * @date 2024-12-02
- * 
+ *
  * @copyright Copyright (c) 2024
- * 
+ *
  */
 
 #include <debug.h>
@@ -40,6 +40,13 @@
         debug_print("0x%I32X\n", uint32);
     }
 
-    void pr_uint32_bin(const uint32_t uint32) {
-
+    void pr_uint32_bin(uint32_t uint32) {
+        for (int i = 0; i < 32; i++) {
+            debug_print("%d", (uint32 & 0x80000000) >> 31);
+            if ((i + 1) % 8 == 0) {
+                debug_print(" ");
+            }
+            uint32 <<= 1;
+        }
+        debug_print("\n");
     }

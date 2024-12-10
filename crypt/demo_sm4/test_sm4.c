@@ -1,3 +1,14 @@
+/**
+ * @file ./crypt/sm4/test_sm4.c
+ * @brief test the correctness of sm4 algorithm
+ * @author 2022302181113
+ * @version 1.0
+ * @date 2024-12-11
+ *
+ * @copyright Copyright (c) 2024
+ *
+ */
+
 #include <sm4.h>
 #include <stdio.h>
 #include <string.h>

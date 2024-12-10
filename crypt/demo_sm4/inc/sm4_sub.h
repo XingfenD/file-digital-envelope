@@ -1,12 +1,12 @@
 /**
- * @file ./crypt/demo_sm4/inc/sm4_sub.h
+ * @file ./crypt/sm4/inc/sm4_sub.h
  * @brief state the sub functions of sm4 top functions
  * @author 2022302181113
  * @version 1.0
  * @date 2024-12-02
- * 
+ *
  * @copyright Copyright (c) 2024
- * 
+ *
  */
 
 #ifndef SM4_SUB_H

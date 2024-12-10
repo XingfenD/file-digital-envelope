@@ -1,5 +1,5 @@
 /**
- * @file ./inc/bin_lib.h
+ * @file ./utils/inc/bin_lib.h
  * @brief state some basic bits operations
  * @author 2022302181113
  * @version 1.0
