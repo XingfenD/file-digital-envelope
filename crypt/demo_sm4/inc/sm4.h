@@ -1,3 +1,16 @@
+/**
+ * @file ./crypt/demo_sm4/inc/sm4.h
+ * @brief state the top functions of sm4
+ * @author 2022302181113
+ * @version 1.0
+ * @date 2024-12-10
+ *
+ * @copyright Copyright (c) 2024
+ *
+ * TODO: reconstruct the sm4 algorithm, hide the given functions from global domain
+ * add padding encryption function instead
+ */
+
 #ifndef SM4_H
 #define SM4_H
 
@@ -12,6 +25,13 @@ extern "C"
 #define SM4_BLOCK_SIZE 16  /* bytes of AES algoithm block 16 * 8 = 128 */
 #define SM4_KEY_SIZE 16    /* bytes of AES algoithm double key 16 * 8 = 128  */
 #define SM4_ROUNDS 32
+
+    /**
+     * @brief the function to show the module:sm4 is included and compiled correctly
+     *
+     * TODO: this function should be removed in the final version of this project
+     */
+    void sm4_print();
 
     /**
      * @brief Generate encryption subkeys
