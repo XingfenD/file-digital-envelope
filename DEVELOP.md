@@ -18,7 +18,7 @@ for example, 在sm4.h文件内：
 #ifndef SM4_H
 #define SM4_H
 
-    // the fomal content of this head file
+    // the formal content of this head file
 
 #endif /* !SM4_H */
 ~~~
@@ -174,6 +174,65 @@ test目录下的所有*.c文件都会项目根目录下的Makefile编译为同�
 
 如假设一段数据末尾恰好是一个块，且为`FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF 01`时，
 
-它与`FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF   `的填充结果恰好相同。
+它与`FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF`的填充结果恰好相同。
 
-为了避免这种冲突，如果需要填充的原始数据恰好是一个块的整数倍，我们会添加另一个完整的块作为填充，这个块内的每一个字节都是0x10。即填充了16个16;
+为了避免这种冲突，如果需要填充的原始数据恰好是一个块的整数倍，我们会添加另一个完整的块作为填充，这个块内的每一个字节都是0x10。即填充了16个16。
+
+### 文件数字信封的具体设计
+
+我们将文件数字信封设计为拓展名为fde的二进制文件。
+
+根据前文所言，我们知道文件数字信封应该至少包含两个部分：被加密的密钥，与被加密的明文。
+
+为了保证解析文件数字信封的便利性与鲁棒性我们将在文件首部添加一个section，称为head section。
+
+head section的字段在`./utils/utils.h`文件中有定义：
+
+~~~c
+    /**
+     * @brief the head section structure of fde file
+     * @details
+     * file_type    - 0x00 ~ 0x02: a string of 3 characters - must be "FDE"
+     * crypt_alg    - 0x03 ~ 0x03: high four bits refers the asymmetric encryption, low four bits refers the symmetric encryption
+     * sym_key_len  - 0x04 ~ 0x05: bytes-num of the encrypted symmetric key
+     *
+     * the structure of a fde file
+     *
+     * head section - this structure                                            - 6 bytes long
+     * key section  - the symmetric key ( encrypted by asymmetric encryption )  - @sym_key_len bytes long
+     * ciphertext   - the ciphertext encrypted by symmetric key                 - the rest bytes of the file
+     */
+    typedef struct _fde_head {
+        uint8_t file_type[3];   /* a string of 3 characters - must be "FDE" */
+        uint8_t crypt_alg;      /* high four bits refers the asymmetric encryption, low four bits refers the symmetric encryption */
+        uint16_t sym_key_len;   /* bytes-num of the encrypted symmetric key */
+    } FDE_HEAD;
+~~~
+
+1. fde文件的前3个字节，是一个固定字符串"fde", 读取fde文件时应当校验这个字段，以避免错误解析
+2. 第四个字节crypt_alg字段，用于标注加密部分使用的算法，前4个bit用于标注使用的非对称加密算法，后4个比特用于标注对称加密算法（具体如何对应，后面再定义）
+3. 第5、6个字节sym_key_len字段，用于标注被加密的密钥在该fde文件中所占字节数，为了便于读取，这里定义为uint16_t而不是uint8_t[2]
+
+根据字段定义，解析（解密）一个fde文件的流程大致应如下：
+
+1. 使用fopen函数二进制读取("rb"模式)该文件
+2. 判断文件的大小，如果大小不足6字节则报错并退出
+3. 使用fread函数将文件的前6个字节写入一个`FDE_HEAD`结构体中
+4. 判断file_type字段是否为"FDE"，如果不是：报错并退出
+5. 基于crypt_alg字段得出该fde文件使用的两种加密算法
+6. 基于sym_key_len字段，使用fread函数再次向后读取sym_key_len个字节，作为被加密的对称密钥
+7. 使用拥有的私钥（用户输入或读取文件）解密该对称密钥
+8. 读取文件剩下的所有字节，作为密文，使用解密出的对称密钥解密该密文
+
+## 命令行工具功能
+
+### 基础功能
+
+实现基于rsa和sm4两种算法的文件数字信封，视情况决定是否添加、迁移其他加密算法。
+
+### 命令行参数
+
+| -f           | -o                               | -k                                         | -D                                         | -E                                         |
+| ------------ | -------------------------------- | ------------------------------------------ | ------------------------------------------ | ------------------------------------------ |
+| 输入文件路径 | 输出文件路径                     | 非对称密钥的文件路径or密钥的内容（不确定） | 解析模式                                   | 加密模式                                   |
+| 必须         | 可选，默认为文件内存储的原文件名 |                                            | 将输入文件加密为数字信封<br>-D与-E不能共存 | 将输入的文件数字信封解密<br>-D与-E不能共存 |
