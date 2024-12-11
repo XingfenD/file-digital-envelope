@@ -22,7 +22,7 @@ void sm4_print() {
     debug_print("this is function ./crypt/demo_sm4/src/sm4.c:sm4_print()\n");
 }
 
-int sm4_make_enc_subkeys(const uint8_t key[16], uint32_t encSubKeys[32]) {
+/* static */ int sm4_make_enc_subkeys(const uint8_t key[16], uint32_t encSubKeys[32]) {
     uint32_t SM4_fk[4];
 
     for (int i = 0; i < 4; i++) {
@@ -85,11 +85,11 @@ int sm4_make_enc_subkeys(const uint8_t key[16], uint32_t encSubKeys[32]) {
     return 0;
 }
 
-int sm4_make_dec_subkeys(const uint8_t key[16], uint32_t decSubKeys[32]) {
+/* static */ int sm4_make_dec_subkeys(const uint8_t key[16], uint32_t decSubKeys[32]) {
     return sm4_make_enc_subkeys(key, decSubKeys);
 }
 
-void sm4_encrypt_block(const uint8_t *input, const uint32_t encSubKeys[32], uint8_t *output) {
+/* static */ void sm4_encrypt_block(const uint8_t *input, const uint32_t encSubKeys[32], uint8_t *output) {
     uint32_t tmp_words[4] = {
         bytes2word(input),
         bytes2word(input + 4),
@@ -147,7 +147,7 @@ void sm4_encrypt_block(const uint8_t *input, const uint32_t encSubKeys[32], uint
     }
 }
 
-void sm4_decrypt_block(const uint8_t *input, const uint32_t decSubKeys[32], uint8_t *output) {
+/* static */ void sm4_decrypt_block(const uint8_t *input, const uint32_t decSubKeys[32], uint8_t *output) {
     uint32_t tmp_words[4] = {
         bytes2word(input),
         bytes2word(input + 4),
@@ -202,4 +202,12 @@ void sm4_decrypt_block(const uint8_t *input, const uint32_t decSubKeys[32], uint
     for (int i = 0; i < 4; i++) {
         word2bytes(&output[i * 4], tmp_words[3 - i]);
     }
+}
+
+inline void sm4_padding_encrypt(const uint8_t *input, const uint8_t *output, size_t num_of_bytes, const uint8_t key[16]) {
+    /* TODO: finish this function */
+}
+
+inline void sm4_padding_decrypt(const uint8_t *input, const uint8_t *output, size_t in_len, size_t *out_len, const uint8_t key[16]) {
+    /* TODO: finish this function */
 }

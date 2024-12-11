@@ -13,9 +13,6 @@
 #include <stdio.h>
 #include <string.h>
 
-#define BENCHS 10
-#define ROUNDS 100000
-
 // Print bytes in hexadecimal format
 void print_bytes(const uint8_t *data, size_t size)
 {
