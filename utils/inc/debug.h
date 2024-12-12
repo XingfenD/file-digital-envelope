@@ -31,11 +31,20 @@
      */
     void debug_print(const char *format, ...);
 
+    // void advance_debug_print(const char *format, ...);
+
+    /**
+     * @brief print a uint8 array in hex from left to right
+     * @param[in]   uint8_arr           the array of uint8
+     * @param[in]   len                 the length of uint8
+     */
+    void pr_uint8_arr_hex(const uint8_t * uint8_arr, int len);
+
     /**
      * @brief print all the subkeys directly with new line in the end of a single subkey
      * @param[in]   subKeys
      */
-    void pr_subkey_round(const uint32_t subKeys[32]);
+    // void pr_subkey_round(const uint32_t subKeys[32]);
 
     /**
      * @brief print a uint32_t in hex format
@@ -48,5 +57,12 @@
      * @param[in]   uint32              the uint32_t to print
      */
     void pr_uint32_bin(uint32_t uint32);
+
+    /**
+     * @brief print a integer with prompt message of var_name
+     * @param[in]   var_name            the varible name of int2pr
+     * @param[in]   int2pr              the integer to print
+     */
+    void pr_int(const char *var_name, int int2pr);
 
 #endif /* !DEBUG_H */

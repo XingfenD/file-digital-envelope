@@ -19,6 +19,7 @@ int main() {
     pr_uint32_hex(demo_word);
     debug_print("the result of pr_uint32_bin: ");
     pr_uint32_bin(demo_word);
-
+    debug_print("the result of pr_subkey_word: ");
+    pr_uint8_arr_hex((uint8_t *) &demo_word, 4);
     return 0;
 }

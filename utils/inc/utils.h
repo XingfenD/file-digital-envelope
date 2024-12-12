@@ -13,11 +13,13 @@
 #define UTILS_H
 
     #include <stdint.h>
+    #include <stddef.h>
 
     /**
      * @brief the function to show the module:utils is included and compiled correctly
      *
-     * // TODO: this function should be removed in the final version of this project
+     * TODO: this function should be removed in the final version of this project
+     *
      */
     void utils_print();
 
@@ -25,8 +27,9 @@
      * @brief the head section structure of fde file
      * @details
      * file_type    - 0x00 ~ 0x02: a string of 3 characters - must be "FDE"
-     * crypt_alg    - 0x03 ~ 0x03: high four bits refers the asymmetric encryption, low four bits refers the symmetric encryption
-     * sym_key_len  - 0x04 ~ 0x05: bytes-num of the encrypted symmetric key
+     * origin_ext   - 0x03 ~ 0x13: a string of the extension of the original filename
+     * crypt_alg    - 0x13 ~ 0x13: high four bits refers the asymmetric encryption, low four bits refers the symmetric encryption
+     * sym_key_len  - 0x14 ~ 0x15: bytes-num of the encrypted symmetric key
      *
      * the structure of a fde file
      *
@@ -36,6 +39,7 @@
      */
     typedef struct _fde_head {
         uint8_t file_type[3];   /* a string of 3 characters - must be "FDE" */
+        uint8_t origin_ext[16];  /* the orgin file name' extension */
         uint8_t crypt_alg;      /* high four bits refers the asymmetric encryption, low four bits refers the symmetric encryption */
         uint16_t sym_key_len;   /* bytes-num of the encrypted symmetric key */
     } FDE_HEAD;
@@ -55,5 +59,15 @@
      * @return size_t the length before padding
      */
     size_t pkcs7_parsed_len(const uint8_t bytes_to_parse, size_t in_len);
+
+    /**
+     * @brief malloc the same memory size and copy the content from @src to dst(return)
+     * @param[in]   src                     the src string to be copyed
+     * @return char* - the returned address of the copy of @src
+     *
+     * the copyed string ends with '\0'
+     * NOTE: the caller should free the memory
+     */
+    char *str_malloc_cpy(const char *src);
 
 #endif /* !UTILS_H */

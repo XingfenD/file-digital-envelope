@@ -13,6 +13,7 @@
 #include <table_defs.h>
 #include <bin_lib.h>
 #include <sm4_sub.h>
+#include <stddef.h>
 #include <debug.h>
 
 // #define NOT_LOOP_UNROLL

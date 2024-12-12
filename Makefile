@@ -7,7 +7,7 @@ LDFLAGS =
 INCLUDES =
 # INCLUDES += $(addprefix -I, $(CRYPTS_INC_DIRS))
 
-# defination of directory varibles 
+# defination of directory varibles
 TEST_DIR = ./test
 
 CRYPT_DIR = ./crypt
@@ -37,12 +37,17 @@ TEST_EXECS = $(patsubst $(TEST_DIR)/%.c,$(BIN_DIR)/%.exe,$(TEST_SRCS))
 
 # definations and operations of targets
 
-all: CFLAGS += O0
+all: CFLAGS += -O0
 all: INCLUDES += $(addprefix -I, $(CRYPTS_INC_DIRS)) -I$(UTILS_INC_DIR)
 all: $(MAIN_EXEC)
-	$(MAIN_EXEC)
 
-release: CFLAGS += O3
+test-enc: all
+	$(MAIN_EXEC) -m enc -f ./IOfile/plaintext.txt -o ./IOfile/enc_rst.fde -k ./IOfile/rsa.pub
+
+test-dec: all
+	$(MAIN_EXEC) -m dec -f ./IOfile/enc_rst.fde -k ./IOfile/rsa.key
+
+release: CFLAGS += -O3
 release: INCLUDES += $(addprefix -I, $(CRYPTS_INC_DIRS)) -I$(UTILS_INC_DIR)
 release: clean | $(MAIN_EXEC)
 

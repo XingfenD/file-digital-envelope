@@ -193,8 +193,9 @@ head section的字段在`./utils/utils.h`文件中有定义：
      * @brief the head section structure of fde file
      * @details
      * file_type    - 0x00 ~ 0x02: a string of 3 characters - must be "FDE"
-     * crypt_alg    - 0x03 ~ 0x03: high four bits refers the asymmetric encryption, low four bits refers the symmetric encryption
-     * sym_key_len  - 0x04 ~ 0x05: bytes-num of the encrypted symmetric key
+     * origin_ext   - 0x03 ~ 0x13: a string of the extension of the original filename
+     * crypt_alg    - 0x13 ~ 0x13: high four bits refers the asymmetric encryption, low four bits refers the symmetric encryption
+     * sym_key_len  - 0x14 ~ 0x15: bytes-num of the encrypted symmetric key
      *
      * the structure of a fde file
      *
@@ -204,14 +205,16 @@ head section的字段在`./utils/utils.h`文件中有定义：
      */
     typedef struct _fde_head {
         uint8_t file_type[3];   /* a string of 3 characters - must be "FDE" */
+        uint8_t origin_ext[16];  /* the orgin file name' extension */
         uint8_t crypt_alg;      /* high four bits refers the asymmetric encryption, low four bits refers the symmetric encryption */
         uint16_t sym_key_len;   /* bytes-num of the encrypted symmetric key */
     } FDE_HEAD;
 ~~~
 
 1. fde文件的前3个字节，是一个固定字符串"fde", 读取fde文件时应当校验这个字段，以避免错误解析
-2. 第四个字节crypt_alg字段，用于标注加密部分使用的算法，前4个bit用于标注使用的非对称加密算法，后4个比特用于标注对称加密算法（具体如何对应，后面再定义）
-3. 第5、6个字节sym_key_len字段，用于标注被加密的密钥在该fde文件中所占字节数，为了便于读取，这里定义为uint16_t而不是uint8_t[2]
+2. 紧接着的16个字节，存储原文件的拓展名or文件名
+3. 下一个字节crypt_alg字段，用于标注加密部分使用的算法，前4个bit用于标注使用的非对称加密算法，后4个比特用于标注对称加密算法（具体如何对应，后面再定义）
+4. 最后两个字节sym_key_len字段，用于标注被加密的密钥在该fde文件中所占字节数，为了便于读取，这里定义为uint16_t而不是uint8_t[2]
 
 根据字段定义，解析（解密）一个fde文件的流程大致应如下：
 

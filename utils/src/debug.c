@@ -23,21 +23,25 @@
         #endif /* DEBUG_ON */
     }
 
-    void pr_subkey_word(const unsigned char * word_addr) {
-        for (int i = 0; i < 4; i++) {
-            debug_print("%02X ", word_addr[i]);
+    void pr_uint8_arr_hex(const uint8_t * uint8_arr, int len) {
+        for (int i = 0; i < len; i++) {
+            debug_print("0x%02X ", uint8_arr[i]);
         }
         debug_print("\n");
     }
 
-    void pr_subkey_round(const uint32_t subKeys[32]) {
-        for (int i = 0; i < 32; i++) {
-            debug_print("0x%I32X\n", subKeys[i]);
-        }
-    }
+    // void pr_subkey_round(const uint32_t subKeys[32]) {
+    //     for (int i = 0; i < 32; i++) {
+    //         debug_print("0x%I32X\n", subKeys[i]);
+    //     }
+    // }
 
     void pr_uint32_hex(const uint32_t uint32) {
-        debug_print("0x%I32X\n", uint32);
+        #if defined(_WIN32) || defined(_WIN64)
+            debug_print("0x%I32X\n", uint32);
+        #elif defined(__linux__) /* _WIN32 || _WIN64 */
+            debug_print("0x%08X\n", uint32);
+        #endif /* __linux__ */
     }
 
     void pr_uint32_bin(uint32_t uint32) {
@@ -49,4 +53,8 @@
             uint32 <<= 1;
         }
         debug_print("\n");
+    }
+
+    void pr_int(const char *var_name, int int2pr){
+        debug_print("%s == %d\n", var_name, int2pr);
     }
