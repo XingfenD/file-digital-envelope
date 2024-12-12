@@ -41,6 +41,8 @@ all: CFLAGS += -O0
 all: INCLUDES += $(addprefix -I, $(CRYPTS_INC_DIRS)) -I$(UTILS_INC_DIR)
 all: $(MAIN_EXEC)
 
+remake: clean | all
+
 test-enc: all
 	$(MAIN_EXEC) -m enc -f ./IOfile/plaintext.txt -o ./IOfile/enc_rst.fde -k ./IOfile/rsa.pub
 
