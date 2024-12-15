@@ -14,6 +14,7 @@
 
     #include <stdint.h>
     #include <stddef.h>
+    #include <malloc.h>
 
     /**
      * @brief the function to show the module:utils is included and compiled correctly
@@ -60,14 +61,50 @@
      */
     size_t pkcs7_parsed_len(const uint8_t bytes_to_parse, size_t in_len);
 
-    /**
-     * @brief malloc the same memory size and copy the content from @src to dst(return)
-     * @param[in]   src                     the src string to be copyed
-     * @return char* - the returned address of the copy of @src
-     *
-     * the copyed string ends with '\0'
-     * NOTE: the caller should free the memory
-     */
-    char *str_malloc_cpy(const char *src);
+    /* start of advanced string function statements */
+    /* function names in this module start with str_ */
+    #ifdef UITILS_STR_MOD
+    #error "Macro UITILS_STR_MOD already defined"
+    #endif/* UITILS_STR_MOD */
+    #define UITILS_STR_MOD
+    #ifdef UITILS_STR_MOD
+
+        /**
+         * @brief add @src to the end of @dst and store the result to a new string
+         * @param[in]   dst                     the start part of result
+         * @param[in]   src                     the end part of result
+         * @return char* - the strcat result
+         * @details
+         * the copyed string ends with '\0'
+         * NOTE: the caller should free the memory
+         */
+        // char* str_malloc_cat(const char *dst, const char *src);
+
+        /**
+         * @brief malloc the same memory size and copy the content from @src to dst(return)
+         * @param[in]   src                     the src string to be copyed
+         * @return char* - the returned address of the copy of @src
+         * @details
+         * the copyed string ends with '\0'
+         * NOTE: the caller should free the memory
+         */
+        char *str_malloc_cpy(const char *src);
+
+        /**
+         * @brief replace the extension of @origin_file_name with @new_ext_name
+         * @param[in]   origin_file_name        the origin file name to replace
+         * @param[in]   new_ext_name            the new extension
+         * @return char* - the replaced file name
+         * @details
+         * the returned string ends with '\0'
+         * NOTE: the caller should free the memory
+         *
+         * if the input @origin_file_name does not have an extension
+         * this function will add an extension to it
+         */
+        char *str_rep_ext(const char *origin_file_name, const char *new_ext_name);
+
+    #endif /* UITILS_STR_MOD */
+    /* end of advanced string function statements */
 
 #endif /* !UTILS_H */

@@ -57,11 +57,11 @@ test: INCLUDES += $(addprefix -I, $(CRYPTS_INC_DIRS)) -I$(UTILS_INC_DIR)
 test: $(TEST_EXECS)
 	@for exe in $(TEST_EXECS); do \
 		echo; \
-		echo ">===================  Running $$(basename $$exe) ===================<"; \
+		echo ">+++++++++++++++++++  Running $$(basename $$exe) +++++++++++++++++++<"; \
 		echo; \
 		./$$exe; \
 		echo; \
-		echo ">=============== Finished running $$(basename $$exe) ===============<"; \
+		echo ">--------------- Finished running $$(basename $$exe) ---------------<"; \
 		echo; \
 	done
 

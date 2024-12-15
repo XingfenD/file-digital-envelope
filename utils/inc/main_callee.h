@@ -18,16 +18,25 @@
 
     /**
      * @brief parse the fde file head and output the @cipher_key and @cipher_text
-     * @param[in]   fde_file_path
-     * @param[out]  cipher_key[length = @cipher_key_len]        - the encrypted symmetric key
-     * @param[out]  cipher_text[length = @cipher_text_len]      - the encrypted text
+     * @param[in]   fde_file_path                           the path to the fde file
+     * @param[out]  file_ext_name                           the file extension encoded in fde file
+     * @param[out]  crypt_alg                               the field of crypt algorithm
+     * @param[out]  cipher_key[length=@cipher_key_len]      the encrypted symmetric key
+     * @param[out]  cipher_text[length=@cipher_text_len]    the encrypted text
      * @param[out]  cipher_key_len
      * @param[out]  cipher_text_len
      * @return int - the status code
      * 0 - returns normally
+     *
+     * @details
+     * NOTE: the caller should malloc 17 bytes to @file_ext_name
+     * NOTE: the caller should free the @cipher_key and @cipher_text
+     * NOTE: the caller should pass address of two size_t @cipher_key_len and @cipher_text_len
      */
     int parse_fde_file(
         const char *fde_file_path,
+        char *file_ext_name,
+        uint8_t *crypt_alg,
         uint8_t *cipher_key, uint8_t *cipher_text,
         size_t *cipher_key_len, size_t *cipher_text_len
     );

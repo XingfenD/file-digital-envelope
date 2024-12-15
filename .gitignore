@@ -9,3 +9,5 @@ temp/*
 *.o
 
 *.gbdinit
+
+*.tmp

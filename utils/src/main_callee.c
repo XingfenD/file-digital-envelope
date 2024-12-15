@@ -10,11 +10,13 @@
  * NOTE: the functions in this file shouldn't be called by other modules except for ./main.c
  */
 
+#include <debug.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <utils.h>
-#include <debug.h>
+#include <string.h>
+#include <defs.h>
 
 long get_file_size(FILE *stream) {
 	long file_size = -1;
@@ -40,6 +42,8 @@ long get_file_size(FILE *stream) {
 
 int parse_fde_file(
     const char *fde_file_path,
+	char *file_ext_name,
+	uint8_t *crypt_alg,
     uint8_t *cipher_key, uint8_t *cipher_text,
     size_t *cipher_key_len, size_t *cipher_text_len
 ) {
@@ -48,9 +52,9 @@ int parse_fde_file(
     size_t file_size = (size_t) get_file_size(pfde);
 
     if (file_size <= (sizeof(fde_head))) {
-
+		return ERR_PARSE_FAIL;
     }
     fread(&fde_head, sizeof(fde_head), 1, pfde);
-    
-
+    memcpy(file_ext_name, &(fde_head.origin_ext), 16);
+	*cipher_key_len = (size_t) fde_head.sym_key_len;
 }
