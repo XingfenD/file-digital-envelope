@@ -97,7 +97,7 @@ extern "C"
      * consequently, the caller of this function should calculate the size of output
      * and malloc memory to varibles (call the function:./utils::pkcs7_padded_len)
      */
-    void sm4_padding_encrypt(const uint8_t *input, const uint8_t *output, size_t num_of_bytes, const uint8_t key[SM4_KEY_SIZE]);
+    void sm4_padding_encrypt(const uint8_t *input, uint8_t **output, size_t num_of_bytes, const uint8_t key[SM4_KEY_SIZE]);
 
     /**
      * @brief SM4 decrypt arbitrary length
@@ -112,7 +112,7 @@ extern "C"
      * the decrypt result will contain padding bytes, this function should identify these padding bytes
      * and pass the real length of plaintext to pointer @out_len (call the function:./utils::pkcs7_parsed_len)
      */
-    void sm4_padding_decrypt(const uint8_t *input, const uint8_t *output, size_t in_len, size_t *out_len, const uint8_t key[SM4_KEY_SIZE]);
+    void sm4_padding_decrypt(const uint8_t *input, uint8_t **output, size_t in_len, size_t *out_len, const uint8_t key[SM4_KEY_SIZE]);
 
 #ifdef __cplusplus
 }

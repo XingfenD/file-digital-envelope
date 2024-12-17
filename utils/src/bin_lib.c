@@ -26,13 +26,13 @@ inline uint32_t xor_uint8_uint32(const uint8_t bytes[4], const uint32_t word) {
     /**
      * assume the bytes array is bytes[4] = { 0x01, 0x23, 0x45, 0x67 }
      * and the word = 0x01234567
-     * 
+     *
      * if we read the pointer @bytes as (uint32_t *)
      * the result will be 0x67452301
-     * 
+     *
      * and compute the xor with @word directly,
      * the returned value will be not as expected
-     * 
+     *
      * consequently, we should compute the xor of the higher byte in @word and lower index in bytes array
      * and then join them together
      */

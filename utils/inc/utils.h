@@ -45,21 +45,45 @@
         uint16_t sym_key_len;   /* bytes-num of the encrypted symmetric key */
     } FDE_HEAD;
 
-    /**
-     * @brief calculate the PKCS#7 padded length of @bytes_to_pad
-     * @param[in]   bytes_to_pad            the input bytes to calculate padded length
-     * @param[in]   in_len                  the length of @bytes_to_pad
-     * @return size_t - the padded length
-     */
-    size_t pkcs7_padded_len(const uint8_t bytes_to_pad, size_t in_len);
 
-    /**
-     * @brief calculate the length of data before applying PKCS#7 padding
-     * @param[in]   bytes_to_parse          the input bytes to calculate parsed length
-     * @param[in]   in_len                  the length of @bytes_to_parse
-     * @return size_t the length before padding
-     */
-    size_t pkcs7_parsed_len(const uint8_t bytes_to_parse, size_t in_len);
+    /* start of pkcs7 function statements */
+    /* function names in this module start with pkcs7_ */
+    #ifdef UITILS_PKCS7_MOD
+    #error "Macro UITILS_PKCS7_MOD already defined"
+    #endif/* UITILS_PKCS7_MOD */
+    #define UITILS_PKCS7_MOD
+    #ifdef UITILS_PKCS7_MOD
+        /* NOTE: the pkcs7 block size is 16 */
+
+        /**
+         * @brief calculate the PKCS#7 padded length of @bytes_to_pad
+         * @param[in]   in_len                  the length of @bytes_to_pad
+         * @return size_t - the padded length
+         */
+        size_t pkcs7_padded_len(size_t in_len);
+
+        /**
+         * @brief calculate the length of data before applying PKCS#7 padding
+         * @param[in]   bytes_to_parse          the input bytes to calculate parsed length
+         * @param[in]   in_len                  the length of @bytes_to_parse
+         * @return size_t the length before padding
+         */
+        size_t pkcs7_parsed_len(const uint8_t *bytes_to_parse, size_t in_len);
+
+        /**
+         * @brief padding a block using PKCS#7
+         * @param[in]   input[length=@in_len]   the bytes to be padded
+         * @param[in]   in_len                  the length of input
+         * @param[out]  output                  the result of padding
+         * @details
+         * NOTE: the caller should malloc out_len bytes to the @output
+         * use function pkcs7_padded_len to calculate @out_len mentioned above
+         */
+        void pkcs7_padding(const uint8_t *input, const size_t in_len, uint8_t *output);
+
+    #endif /* UITILS_PKCS7_MOD */
+    /* end of pkcs7 function statements */
+
 
     /* start of advanced string function statements */
     /* function names in this module start with str_ */

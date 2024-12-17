@@ -15,6 +15,7 @@
 #include <sm4_sub.h>
 #include <stddef.h>
 #include <debug.h>
+#include <utils.h>
 
 // #define NOT_LOOP_UNROLL
 
@@ -205,10 +206,15 @@ void sm4_print() {
     }
 }
 
-inline void sm4_padding_encrypt(const uint8_t *input, const uint8_t *output, size_t num_of_bytes, const uint8_t key[16]) {
+inline void sm4_padding_encrypt(const uint8_t *input, const uint8_t **output, size_t in_len, size_t *out_len, const uint8_t key[16]) {
     /* TODO: finish this function */
+    uint8_t *padded_input = malloc(sizeof(uint8_t) * pkcs7_padded_len(in_len));
+    *out_len = pkcs7_padded_len(in_len);
+
+
+    free(padded_input);
 }
 
-inline void sm4_padding_decrypt(const uint8_t *input, const uint8_t *output, size_t in_len, size_t *out_len, const uint8_t key[16]) {
+inline void sm4_padding_decrypt(const uint8_t *input, const uint8_t **output, size_t in_len, size_t *out_len, const uint8_t key[16]) {
     /* TODO: finish this function */
 }
