@@ -129,34 +129,40 @@ int main(int argc, char *argv[]) {
             &ciper_key_len, &ciper_text_len
         );
 
+        /* malloc the memory to decrypt_text and sym_key */
+        decrypt_text = malloc(sizeof(uint8_t) * ciper_text_len);
+        sym_key = malloc(sizeof(uint8_t) * ciper_key_len);
+
         /* decrypt the key using asymmetric encrypt algorithm */
         switch (crypt_alg & 0xF0)
         {
         case ASY_RSA:
-            sym_key = malloc(sizeof(uint8_t) * ciper_key_len);
+            uint8_t vector[16];
 
             /* TODO: check the return code of the functions below */
             /* decrypt the sym-key */
-            // read_key_file(keyfile_path, &pub_key, &pub_key_len);
+            read_key_file(keyfile_path, &pub_key, &pub_key_len);
             rsa_padding_decrypt(ciper_key, sym_key, ciper_key_len, pub_key, pub_key_len);
             sym_key_len = ciper_key_len;
             /* decrypt the text */
-            sm4_padding_decrypt(ciper_text, &decrypt_text, ciper_text_len, &decrypt_text_len, sym_key);
+
+            sm4_padding_decrypt(ciper_text, decrypt_text, ciper_text_len, &decrypt_text_len, vector, sym_key);
 
             break;
         default:
             break;
         }
 
-        free(sym_key);
-        free(pub_key);
-        free(ciper_key);
-        free(ciper_text);
+        free(decrypt_text); /* malloced in main after parse_fde_file() */
+        free(sym_key); /* malloced in after parse_fde_file() */
+        free(pub_key); /* malloced in read_key_file() */
+        free(ciper_key); /* malloced and inited in parse_fde_file() */
+        free(ciper_text); /* malloced and inited in parse_fde_file() */
     }
 
 
 exit:
     // free(infile_path);
-    free(outfile_path);
+    free(outfile_path); /* malloced and inited in parsing cmd line args */
     return ret;
 }

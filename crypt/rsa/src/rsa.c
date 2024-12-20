@@ -21,5 +21,5 @@ void rsa_padding_encrypt(const uint8_t *input, uint8_t *output, size_t in_len, c
 }
 
 void rsa_padding_decrypt(const uint8_t *input, uint8_t *output, size_t in_len, const uint8_t *key, const size_t key_len) {
-    
+
 }

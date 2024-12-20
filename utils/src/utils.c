@@ -82,7 +82,6 @@ char *str_rep_ext(const char *origin_file_name, const char *new_ext_name) {
         ret = str_malloc_cat(origin_file_name, new_ext_name);
     } else {
         ret = calloc((int) (p_dot - origin_file_name) + 1 + strlen(new_ext_name) + 1, sizeof(char));
-        // dbpr_int("calloc size", (int) (p_dot - origin_file_name) + 1 + strlen(new_ext_name) + 1);
         memcpy(ret, origin_file_name, (p_dot - origin_file_name) + 1);
         strcat(ret, new_ext_name);
     }

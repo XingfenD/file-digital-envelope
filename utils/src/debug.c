@@ -64,11 +64,3 @@ void dbpr_uint32_bin(uint32_t uint32) {
 void dbpr_int(const char *var_name, int int2pr){
     debug_print("%s == %d\n", var_name, int2pr);
 }
-
-// void dbpr_fde_head(const FDE_HEAD fde_head) {
-//     debug_print("string: %s\n", fde_head.file_type);
-//     debug_print("crypt_alg: ");
-//     dbpr_uint32_hex(fde_head.crypt_alg);
-//     debug_print("sym_key_len: ");
-//     dbpr_uint32_hex(fde_head.sym_key_len);
-// }

@@ -73,10 +73,4 @@
      */
     void dbpr_int(const char *var_name, int int2pr);
 
-    /**
-     * @brief print the content in a FDE_HEAD struct
-     * @param[in]   fde_head            the FDE_HEAD to print
-     */
-    // void dbpr_fde_head(const FDE_HEAD fde_head);
-
 #endif /* !DEBUG_H */
