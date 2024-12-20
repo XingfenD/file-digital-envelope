@@ -18,13 +18,39 @@ void utils_print() {
     debug_print("this is function ./utils/src/utils.c:utils_print()\n");
 }
 
-size_t pkcs7_padded_len(const uint8_t bytes_to_pad, size_t in_len) {
-    /* TODO: finish this function */
+/* start of pkcs7 function definations */
+
+size_t pkcs7_padded_len(size_t in_len) {
+    /* find the smallest multiple of 16 greater than @in_len */
+    if (in_len % 16 == 0) {
+        return in_len + 16;
+    } else {
+        return ((in_len + 15) >> 4) << 4;
+    }
 }
 
-size_t pkcs7_parsed_len(const uint8_t bytes_to_parse, size_t in_len) {
-    /* TODO: finish this function  */
+size_t pkcs7_parsed_len(const uint8_t *bytes_to_parse, size_t in_len) {
+    /* read the last byte in the array */
+    int padded_bytes_num = bytes_to_parse[(int) in_len - 1];
+    for (int i = in_len - 1; i >= (int) (in_len - padded_bytes_num); i--) {
+        if ((int) bytes_to_parse[i] != padded_bytes_num) {
+            return in_len;
+        }
+    }
+
+    return in_len - padded_bytes_num;
 }
+
+void pkcs7_padding(const uint8_t *input, const size_t in_len, uint8_t *output) {
+    memcpy(output, input, in_len);
+    int padded_len = pkcs7_padded_len(in_len);
+    uint8_t pad_byte =  padded_len - in_len;
+    for (int i = in_len; i < padded_len; i++) {
+        output[i] = pad_byte;
+    }
+}
+
+/* end of pkcs7 function definations */
 
 /* start of advanced string function definations */
 
@@ -56,7 +82,6 @@ char *str_rep_ext(const char *origin_file_name, const char *new_ext_name) {
         ret = str_malloc_cat(origin_file_name, new_ext_name);
     } else {
         ret = calloc((int) (p_dot - origin_file_name) + 1 + strlen(new_ext_name) + 1, sizeof(char));
-        // pr_int("calloc size", (int) (p_dot - origin_file_name) + 1 + strlen(new_ext_name) + 1);
         memcpy(ret, origin_file_name, (p_dot - origin_file_name) + 1);
         strcat(ret, new_ext_name);
     }

@@ -28,13 +28,13 @@
      * @brief the head section structure of fde file
      * @details
      * file_type    - 0x00 ~ 0x02: a string of 3 characters - must be "FDE"
-     * origin_ext   - 0x03 ~ 0x13: a string of the extension of the original filename
+     * origin_ext   - 0x03 ~ 0x12: a string of the extension of the original filename
      * crypt_alg    - 0x13 ~ 0x13: high four bits refers the asymmetric encryption, low four bits refers the symmetric encryption
      * sym_key_len  - 0x14 ~ 0x15: bytes-num of the encrypted symmetric key
      *
      * the structure of a fde file
      *
-     * head section - this structure                                            - 6 bytes long
+     * head section - this structure                                            - 22 bytes long
      * key section  - the symmetric key ( encrypted by asymmetric encryption )  - @sym_key_len bytes long
      * ciphertext   - the ciphertext encrypted by symmetric key                 - the rest bytes of the file
      */
@@ -45,21 +45,46 @@
         uint16_t sym_key_len;   /* bytes-num of the encrypted symmetric key */
     } FDE_HEAD;
 
-    /**
-     * @brief calculate the PKCS#7 padded length of @bytes_to_pad
-     * @param[in]   bytes_to_pad            the input bytes to calculate padded length
-     * @param[in]   in_len                  the length of @bytes_to_pad
-     * @return size_t - the padded length
-     */
-    size_t pkcs7_padded_len(const uint8_t bytes_to_pad, size_t in_len);
 
-    /**
-     * @brief calculate the length of data before applying PKCS#7 padding
-     * @param[in]   bytes_to_parse          the input bytes to calculate parsed length
-     * @param[in]   in_len                  the length of @bytes_to_parse
-     * @return size_t the length before padding
-     */
-    size_t pkcs7_parsed_len(const uint8_t bytes_to_parse, size_t in_len);
+    /* start of pkcs7 function statements */
+    /* function names in this module start with pkcs7_ */
+    #ifdef UITILS_PKCS7_MOD
+    #error "Macro UITILS_PKCS7_MOD already defined"
+    #endif/* UITILS_PKCS7_MOD */
+    #define UITILS_PKCS7_MOD
+    #ifdef UITILS_PKCS7_MOD
+        /* NOTE: the pkcs7 block size is 16 */
+
+        /**
+         * @brief calculate the PKCS#7 padded length of @bytes_to_pad
+         * @param[in]   in_len                  the length of @bytes_to_pad
+         * @return size_t - the padded length
+         */
+        size_t pkcs7_padded_len(size_t in_len);
+
+        /**
+         * @brief calculate the length of data before applying PKCS#7 padding
+         * @param[in]   bytes_to_parse          the input bytes to calculate parsed length
+         * @param[in]   in_len                  the length of @bytes_to_parse
+         * @return size_t the length before padding
+         */
+        size_t pkcs7_parsed_len(const uint8_t *bytes_to_parse, size_t in_len);
+
+        /**
+         * @brief padding a bytes array using PKCS#7 (block_size = 16)
+         * @param[in]   input[length=@in_len]   the bytes to be padded
+         * @param[in]   in_len                  the length of input
+         * @param[out]  output                  the result of padding
+         * @note
+         * NOTE: the caller should malloc @out_len bytes to the @output
+         *
+         * use function pkcs7_padded_len to calculate @out_len mentioned above
+         */
+        void pkcs7_padding(const uint8_t *input, const size_t in_len, uint8_t *output);
+
+    #endif /* UITILS_PKCS7_MOD */
+    /* end of pkcs7 function statements */
+
 
     /* start of advanced string function statements */
     /* function names in this module start with str_ */
@@ -74,8 +99,9 @@
          * @param[in]   dst                     the start part of result
          * @param[in]   src                     the end part of result
          * @return char* - the strcat result
-         * @details
+         * @note
          * the copyed string ends with '\0'
+         *
          * NOTE: the caller should free the memory
          */
         // char* str_malloc_cat(const char *dst, const char *src);
@@ -84,9 +110,10 @@
          * @brief malloc the same memory size and copy the content from @src to dst(return)
          * @param[in]   src                     the src string to be copyed
          * @return char* - the returned address of the copy of @src
-         * @details
-         * the copyed string ends with '\0'
+         * @note
          * NOTE: the caller should free the memory
+         *
+         * the copyed string ends with '\0'
          */
         char *str_malloc_cpy(const char *src);
 
@@ -95,11 +122,12 @@
          * @param[in]   origin_file_name        the origin file name to replace
          * @param[in]   new_ext_name            the new extension
          * @return char* - the replaced file name
-         * @details
-         * the returned string ends with '\0'
+         * @note
          * NOTE: the caller should free the memory
          *
-         * if the input @origin_file_name does not have an extension
+         * the returned string ends with '\0'
+         *
+         * if the input @origin_file_name does not have an extension,
          * this function will add an extension to it
          */
         char *str_rep_ext(const char *origin_file_name, const char *new_ext_name);
