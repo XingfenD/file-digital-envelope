@@ -15,11 +15,11 @@
 int main() {
     uint32_t demo_word = 0x01234567;
 
-    debug_print("the result of pr_uint32_hex: ");
-    pr_uint32_hex(demo_word);
-    debug_print("the result of pr_uint32_bin: ");
-    pr_uint32_bin(demo_word);
-    debug_print("the result of pr_subkey_word: ");
-    pr_uint8_arr_hex((uint8_t *) &demo_word, 4);
+    debug_print("the result of dbpr_uint32_hex: ");
+    dbpr_uint32_hex(demo_word);
+    debug_print("the result of dbpr_uint32_bin: ");
+    dbpr_uint32_bin(demo_word);
+    debug_print("the result of dbpr_subkey_word: ");
+    dbpr_uint8_arr_hex((uint8_t *) &demo_word, 4);
     return 0;
 }
