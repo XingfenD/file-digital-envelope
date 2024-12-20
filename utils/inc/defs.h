@@ -42,6 +42,7 @@
     #define ERR_UNKNOWN_ARG     0x00000005
     #define ERR_PARSE_FAIL      0x00000006
     #define ERR_MISS_PARAM      0x00000007
+    #define ERR_MISSING_FILE    0x00000008
 
     /* end of error code definations */
 

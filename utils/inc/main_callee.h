@@ -28,17 +28,32 @@
      * @return int - the status code
      * 0 - returns normally
      *
-     * @details
-     * NOTE: the caller should malloc 17 bytes to @file_ext_name
-     * NOTE: the caller should free the @cipher_key and @cipher_text
-     * NOTE: the caller should pass address of two size_t @cipher_key_len and @cipher_text_len
+     * @note
+     * NOTE: the caller should malloc 17 bytes to $file_ext_name before calling
+     *
+     * NOTE: the caller should free the $cipher_key and $cipher_text
+     *
+     * NOTE: the caller should pass address of two size_t $cipher_key_len and $cipher_text_len
+     *
+     * we should malloc and asign an address to two (uint8_t*) $cipher_key and $cipher_text,
+     * conseqently, we pass the address of (uint8_t*)
      */
     int parse_fde_file(
-        const char *fde_file_path,
-        char *file_ext_name,
+        const char *fde_file_path, char *file_ext_name,
         uint8_t *crypt_alg,
-        uint8_t *cipher_key, uint8_t *cipher_text,
+        uint8_t **cipher_key, uint8_t **cipher_text,
         size_t *cipher_key_len, size_t *cipher_text_len
     );
+
+    /**
+     * @brief read the key file and write into a byte array
+     * @param[in]   key_file_path                           path to the key file
+     * @param[out]  key                                     the pointer to a (uint8_t*)
+     * @param[out]  key_len                                 the pointer to key_len
+     * @return int - the exit status code
+     * @note
+     * NOTE: the caller should free the memory of @key
+     */
+    int read_key_file(const char *key_file_path, uint8_t **key, size_t *key_len);
 
 #endif /* !MAIN_CALLEE_H */
