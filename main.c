@@ -13,15 +13,15 @@
 #include <getopt.h>
 #include <utils.h>
 #include <defs.h>
-#include <malloc.h>
 #include <string.h>
 #include <main_callee.h>
+#include <crypt.h>
 
 int main(int argc, char *argv[]) {
     int opt;
     int mode = UN_ASSIGNED;
     int ret = 0;
-    char *infile_path = NULL, *outfile_path = NULL, *keyfile_path;
+    char *infile_path = NULL, *outfile_path = NULL, *keyfile_path = NULL;
 
     // parse the command line input
     while ((opt = getopt(argc, argv, "f:o:k:m:h")) != -1) {
@@ -110,19 +110,46 @@ int main(int argc, char *argv[]) {
 
         /* init default arg */
         if (outfile_path == NULL) {
+            /* set the output file name if the path are not specified */
             outfile_path = str_rep_ext(infile_path, "fde");
         }
 
 
     } else if (mode == DEC_MODE){
         char ext_name[17];
-        uint8_t *ciper_key = NULL, *ciper_text = NULL;
+        uint8_t *ciper_key = NULL, *ciper_text = NULL, *pub_key = NULL, *sym_key = NULL, *decrypt_text = NULL;
+        size_t ciper_key_len, ciper_text_len, pub_key_len, sym_key_len, decrypt_text_len;
         uint8_t crypt_alg;
-        size_t ciper_text_len, ciper_key_len;
 
-        /* init default arg */
-        parse_fde_file(infile_path, ext_name, &crypt_alg, ciper_key, ciper_text, &ciper_key_len, &ciper_text_len);
+        /* parse the fde head and read body */
+        parse_fde_file(
+            infile_path, ext_name,
+            &crypt_alg,
+            &ciper_key, &ciper_text,
+            &ciper_key_len, &ciper_text_len
+        );
 
+        /* decrypt the key using asymmetric encrypt algorithm */
+        switch (crypt_alg & 0xF0)
+        {
+        case ASY_RSA:
+            sym_key = malloc(sizeof(uint8_t) * ciper_key_len);
+
+            /* TODO: check the return code of the functions below */
+            /* decrypt the sym-key */
+            // read_key_file(keyfile_path, &pub_key, &pub_key_len);
+            rsa_padding_decrypt(ciper_key, sym_key, ciper_key_len, pub_key, pub_key_len);
+            sym_key_len = ciper_key_len;
+            /* decrypt the text */
+            sm4_padding_decrypt(ciper_text, &decrypt_text, ciper_text_len, &decrypt_text_len, sym_key);
+
+            break;
+        default:
+            break;
+        }
+
+        free(sym_key);
+        free(pub_key);
         free(ciper_key);
         free(ciper_text);
     }

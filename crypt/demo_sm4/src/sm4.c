@@ -15,6 +15,7 @@
 #include <sm4_sub.h>
 #include <stddef.h>
 #include <debug.h>
+#include <utils.h>
 
 // #define NOT_LOOP_UNROLL
 
@@ -28,7 +29,7 @@ void sm4_print() {
 
     for (int i = 0; i < 4; i++) {
         SM4_fk[i] = xor_uint8_uint32(key + i * 4, SM4_FK[i]);
-        // pr_uint32_hex(fk[i]); /* passed */
+        // dbpr_uint32_hex(fk[i]); /* passed */
     }
 
     {
@@ -41,7 +42,7 @@ void sm4_print() {
                 SM4_CK[0]
             )
         ;
-        // pr_uint32_hex(encSubKeys[0]);
+        // dbpr_uint32_hex(encSubKeys[0]);
         encSubKeys[1] =
             SM4_fk[1] ^
             sm4_t_rev(
@@ -205,10 +206,44 @@ void sm4_print() {
     }
 }
 
-inline void sm4_padding_encrypt(const uint8_t *input, const uint8_t *output, size_t num_of_bytes, const uint8_t key[16]) {
-    /* TODO: finish this function */
+void sm4_padding_encrypt(
+    const uint8_t *input, uint8_t **output,
+    size_t in_len, size_t *out_len,
+    const uint8_t vector[16], const uint8_t key[16]
+) {
+    /* init the variables and malloc memory */
+    *out_len = pkcs7_padded_len(in_len);
+    uint8_t *padded_input = malloc(sizeof(uint8_t) * *out_len);
+    *output = malloc(sizeof(uint8_t) * *out_len);
+
+    /* pad the input bytes */
+    pkcs7_padding(input, in_len, padded_input);
+
+    /* TODO: execute sm4_cbc_encrypt process below */
+    /**
+     * related varibles
+     * @param[in]   padded_input        the bytes to encrypt in cbc mode
+     * @param[out]  *output             the encrypt result of cbc
+     * @param[in]   *out_len            both the length of @padded_input and @*output
+     * @param[in]   vector              the origin xor arg vector (iv)
+     */
+
+    free(padded_input);
 }
 
-inline void sm4_padding_decrypt(const uint8_t *input, const uint8_t *output, size_t in_len, size_t *out_len, const uint8_t key[16]) {
-    /* TODO: finish this function */
+void sm4_padding_decrypt(
+    const uint8_t *input, uint8_t *output,
+    size_t in_len, size_t *out_len,
+    const uint8_t vector[16], const uint8_t key[16]
+) {
+    /* TODO: execute sm4_cbc_decrypt process below */
+    /**
+     * related varibles
+     * @param[in]   input               the bytes to decrypt in cbc mode
+     * @param[out]  output              the decrypt result of cbc
+     * @param[in]   in_len              both the length of @input and @output
+     * @param[in]   vector              the origin xor arg vector (iv)
+     */
+
+    *out_len = pkcs7_parsed_len(output, in_len);
 }
