@@ -97,12 +97,12 @@ int parse_fde_file(
     return 0;
 }
 
-int read_key_file(const char *key_file_path, uint8_t **key, size_t *key_len) {
-    FILE *keyfile = fopen(key_file_path, "rb");
+int read_bin_file(const char *bin_file_path, uint8_t **outbytes, size_t *bytes_len) {
+    FILE *keyfile = fopen(bin_file_path, "rb");
 
-    *key_len = get_file_size(keyfile);
-    *key = malloc(sizeof(uint8_t) * *key_len);
-    fread(*key, 1, *key_len, keyfile);
+    *bytes_len = get_file_size(keyfile);
+    *outbytes = malloc(sizeof(uint8_t) * *bytes_len);
+    fread(*outbytes, 1, *bytes_len, keyfile);
     fclose(keyfile);
 
     return 0;

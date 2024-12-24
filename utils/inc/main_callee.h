@@ -60,15 +60,15 @@
     int parse_fde_file(const char *fde_file_path, char *file_ext_name, ParseRst *parse_rst);
 
     /**
-     * @brief read the key file and write into a byte array
-     * @param[in]   key_file_path           path to the key file
-     * @param[out]  key                     the pointer to a (uint8_t*)
-     * @param[out]  key_len                 the pointer to key_len
+     * @brief read the bin_file and write into a byte array
+     * @param[in]   bin_file_path           path to the bin file
+     * @param[out]  bin                     the pointer to a (uint8_t*)
+     * @param[out]  bin_len                 the pointer to bin_len
      * @return int - the exit status code
      * @note
-     * NOTE: the caller should free the memory of @key
+     * NOTE: the caller should free the memory of @bin
      */
-    int read_key_file(const char *key_file_path, uint8_t **key, size_t *key_len);
+    int read_bin_file(const char *bin_file_path, uint8_t **bin, size_t *bin_len);
 
     void fde_print_help();
 

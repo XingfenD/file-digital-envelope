@@ -148,4 +148,13 @@
     #endif /* UITILS_STR_MOD */
     /* end of advanced string function statements */
 
+    /**
+     * @brief random and malloc a bytes array
+     * @param[out]  byte2random     the output of random bytes
+     * @param[in]   bytes_num       number of bytes to generate randomly
+     * @note
+     * NOTE: the caller should malloc $bytes_num bytes memory to $bytes2random
+     */
+    void random_bytes(uint8_t *bytes2random, int bytes_num);
+
 #endif /* !UTILS_H */

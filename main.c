@@ -16,7 +16,10 @@
 #include <string.h>
 #include <main_callee.h>
 #include <crypt.h>
+#include <time.h>
+#include <stdlib.h>
 
+/* TODO: reconstruct the main function */
 int main(int argc, char *argv[]) {
     int opt;
     int mode = UN_ASSIGNED;
@@ -32,7 +35,6 @@ int main(int argc, char *argv[]) {
                 if (infile_path == NULL) {
                     printf("Input file: %s\n", optarg);
                     infile_path = optarg;
-                    // infile_path = str_malloc_cpy(optarg);
                 } else {
                     printf("Multiple options: -%c\n", opt);
                     // ret = ERR_MULTPLE_OPT;
@@ -44,7 +46,6 @@ int main(int argc, char *argv[]) {
                 if (outfile_path == NULL) {
                     printf("Output file: %s\n", optarg);
                     outfile_path = optarg;
-                    // outfile_path = str_malloc_cpy(optarg);
                 } else {
                     printf("Multiple options: -%c\n", opt);
                     EXIT_MAIN(ERR_MULTPLE_OPT);
@@ -54,7 +55,6 @@ int main(int argc, char *argv[]) {
                 if (keyfile_path == NULL) {
                     printf("Key file: %s\n", optarg);
                     keyfile_path = optarg;
-                    // outfile_path = str_malloc_cpy(optarg);
                 } else {
                     printf("Multiple options: -%c\n", opt);
                     EXIT_MAIN(ERR_MULTPLE_OPT);
@@ -108,6 +108,14 @@ int main(int argc, char *argv[]) {
         }
     }
 
+    /* start of handling parameter relationships */
+
+    /* missing inputfile handling */
+    if (infile_path == NULL) {
+        printf("Required parameters are not specified: -f");
+        EXIT_MAIN(ERR_MISS_PARAM)
+    }
+
     /* missing keyfile handling */
     if (keyfile_path == NULL) {
         printf("Required parameters are not specified: -k");
@@ -141,8 +149,36 @@ int main(int argc, char *argv[]) {
         ASK_EXIT_MAIN
     } /* optind < argc */
 
+    /* end of handling parameter relationships */
+
     /* execute main function according to the args input */
     if (mode == ENC_MODE) {
+        uint8_t *plain_text = NULL, cipher_text = NULL;
+        uint8_t *asy_info = NULL, sym_info = NULL;
+        uint8_t *sym_key = NULL, *pub_key = NULL;
+        size_t plain_text_len, cipher_text_len, pub_key_len;
+        FILE *outfile = NULL;
+        FDE_HEAD fde_head = {};
+
+        /**
+         * @brief assign basic value to fde_head
+         * [*] file_type
+         * [*] origin_ext
+         * [*] crypt_alg
+         * [ ] asy_info_len
+         * [ ] sym_info_len
+         * [ ] sym_key_len - will be assigned in symmtric switch block
+         */
+        strcpy(fde_head.file_type, "FDE");
+        fde_head.crypt_alg = crypt_algo;
+        char *pdot = strrchr(infile_path, '.');
+        if (NULL == pdot) {
+            for (int i = 0; i < 16; i++) {
+                fde_head.origin_ext[i] = '\0';
+            }
+        } else {
+            strcpy(fde_head.origin_ext, pdot + 1);
+        }
 
         /* init default arg */
         if (outfile_path == NULL) {
@@ -150,7 +186,42 @@ int main(int argc, char *argv[]) {
             outfile_path = str_rep_ext(infile_path, "fde");
         }
 
+        /* TODO: check the return code of the functions below */
 
+        // outfile = fopen(outfile_path, "wb");
+        read_bin_file(infile_path, &plain_text, &plain_text_len);
+        read_bin_file(keyfile_path, &pub_key, &pub_key_len);
+
+        srand((unsigned)time(NULL));
+
+        switch (GET_SYM_BITS(crypt_algo))
+        {
+        case SYM_SM4:
+            fde_head.sym_key_len = 16;
+            fde_head.sym_info_len = 16;
+            sym_info = malloc(fde_head.sym_info_len * sizeof(uint8_t));
+            sym_key = malloc(fde_head.sym_key_len * sizeof(uint8_t));
+            random_bytes(sym_info, fde_head.sym_info_len);
+            random_bytes(sym_key, fde_head.sym_key_len);
+            sm4_padding_encrypt(plain_text, &cipher_text, plain_text_len, &cipher_text_len, sym_info, sym_key);
+            break;
+        default:
+            break;
+        }
+
+        switch (GET_ASY_BITS(crypt_algo))
+        {
+        case ASY_RSA:
+            break;
+        default:
+            break;
+        }
+
+        free(sym_key); /* malloced in symmetric encryption */
+        free(sym_info); /* malloced in symmetric encryption */
+        free(asy_info); /* malloced in asymmetric encryption */
+        free(plain_text); /* malloced in read_bin_file */
+        free(pub_key);  /* malloced in read_bin_file */
     } else if (mode == DEC_MODE){ /* if (mode == ENC_MODE) */
         char ext_name[17];
 
@@ -172,21 +243,13 @@ int main(int argc, char *argv[]) {
         case ASY_RSA:
             /* TODO: check the return code of the functions below */
             /* decrypt the sym-key */
-            read_key_file(keyfile_path, &pub_key, &pub_key_len);
+            read_bin_file(keyfile_path, &pub_key, &pub_key_len);
             rsa_padding_decrypt(
                 parse_rst.crypted_key, sym_key,
                 parse_rst.crypted_key_len,
                 pub_key, pub_key_len
             );
             sym_key_len = parse_rst.crypted_key_len;
-            /* decrypt the text */
-
-            sm4_padding_decrypt(
-                parse_rst.crypted_text, decrypt_text,
-                parse_rst.crypted_text_len, &decrypt_text_len,
-                parse_rst.sym_info, sym_key
-            );
-
             break;
         default:
             break;
@@ -196,16 +259,32 @@ int main(int argc, char *argv[]) {
         switch (GET_SYM_BITS(parse_rst.crypt_alg))
         {
         case SYM_SM4:
-
+            sm4_padding_decrypt(
+                parse_rst.crypted_text, decrypt_text,
+                parse_rst.crypted_text_len, &decrypt_text_len,
+                parse_rst.sym_info, sym_key
+            );
             break;
 
         default:
             break;
         }
 
+        /* write the decrypt result to output file */
+
+        /* init the default outfile_path */
+
+        if (outfile_path == NULL) {
+            outfile_path = str_rep_ext(infile_path, ext_name);
+        }
+
+        FILE *outfile = fopen(outfile_path, "wb");
+        fwrite(decrypt_text, sizeof(uint8_t), decrypt_text_len, outfile);
+        free(outfile);
+
         free(decrypt_text); /* malloced in main after parse_fde_file() */
         free(sym_key); /* malloced in after parse_fde_file() */
-        free(pub_key); /* malloced in read_key_file() */
+        free(pub_key); /* malloced in read_bin_file() */
         free(parse_rst.crypted_key); /* malloced and inited in parse_fde_file() */
         free(parse_rst.crypted_text); /* malloced and inited in parse_fde_file() */
         free(parse_rst.asy_info); /* malloced and inited in parse_fde_file() */
@@ -215,6 +294,6 @@ int main(int argc, char *argv[]) {
 
 exit:
     // free(infile_path);
-    
+    free(outfile_path); /* may be malloced in str_rep_ext */
     return ret;
 }

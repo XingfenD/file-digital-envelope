@@ -12,6 +12,8 @@
 #include <debug.h>
 #include <utils.h>
 #include <string.h>
+#include <stdlib.h>
+#include <time.h>
 
 void utils_print() {
     // TODO: this function should be removed in the final version of this project
@@ -78,7 +80,8 @@ char *str_malloc_cpy(const char *src) {
 char *str_rep_ext(const char *origin_file_name, const char *new_ext_name) {
     char *p_dot = NULL;
     char *ret = NULL;
-    if ((p_dot = strchr(origin_file_name, '.')) == NULL) {
+    if ((p_dot = strrchr(origin_file_name, '.')) == NULL) {
+        /* if there are not extension in the filename */
         ret = str_malloc_cat(origin_file_name, new_ext_name);
     } else {
         ret = calloc((int) (p_dot - origin_file_name) + 1 + strlen(new_ext_name) + 1, sizeof(char));
@@ -97,3 +100,9 @@ char *str_rep_ext(const char *origin_file_name, const char *new_ext_name) {
 // }
 
 /* end of advanced string function definations */
+
+void random_bytes(uint8_t *bytes2random, int bytes_num) {
+    for (int i = 0; i < bytes_num; i++) {
+        bytes2random[i] = (uint8_t) (rand() % 256);
+    }
+}
