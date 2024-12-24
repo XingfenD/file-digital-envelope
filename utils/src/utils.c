@@ -89,4 +89,11 @@ char *str_rep_ext(const char *origin_file_name, const char *new_ext_name) {
     return ret;
 }
 
+// int str_find(const char str2find[], const char *strArr[], const int size) {
+//     int map[size];
+//     for (int i = 0; i < size; i++) {
+//         map[size] = i;
+//     }
+// }
+
 /* end of advanced string function definations */

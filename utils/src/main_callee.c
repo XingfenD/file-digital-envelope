@@ -17,6 +17,7 @@
 #include <utils.h>
 #include <string.h>
 #include <defs.h>
+#include <main_callee.h>
 
 static long get_file_size(FILE *stream) {
     long file_size = -1;
@@ -41,20 +42,18 @@ static long get_file_size(FILE *stream) {
 }
 
 int parse_fde_file(
-    const char *fde_file_path, char *file_ext_name,
-    uint8_t *crypt_alg,
-    uint8_t **cipher_key, uint8_t **cipher_text,
-    size_t *cipher_key_len, size_t *cipher_text_len
-) {
+    const char *fde_file_path, char *file_ext_name, ParseRst *parse_rst) {
     FDE_HEAD fde_head;
     FILE *pfde = fopen(fde_file_path, "rb");
 
+    /* open fde file failed */
     if (pfde == NULL) {
         return ERR_MISSING_FILE;
     }
 
+    /* get the size of fde file */
     size_t file_size = (size_t) get_file_size(pfde);
-    if (file_size <= (sizeof(fde_head))) {
+    if (file_size <= (sizeof(fde_head))) { /* basicly check the validity of fde file */
         return ERR_PARSE_FAIL;
     }
 
@@ -66,19 +65,32 @@ int parse_fde_file(
         return ERR_PARSE_FAIL;
     }
 
-    /* copy the values */
+    /* copy the values of the first two useful fields */
     memcpy(file_ext_name, fde_head.origin_ext, 16);
-    *crypt_alg = fde_head.crypt_alg;
+    parse_rst->crypt_alg = fde_head.crypt_alg;
 
-    /* get the length of key & text */
-    *cipher_key_len = (size_t) fde_head.sym_key_len;
-    *cipher_text_len = (file_size - *cipher_key_len - sizeof(fde_head));
+    /* get the length of key & text & info */
+    parse_rst->crypted_key_len = (unsigned short) fde_head.sym_key_len;
+    parse_rst->asy_info_len = (unsigned short) fde_head.asy_info_len;
+    parse_rst->sym_info_len = (unsigned short) fde_head.sym_key_len;
+    parse_rst->crypted_text_len =
+        file_size
+        - parse_rst->crypted_key_len
+        - parse_rst->asy_info_len
+        - parse_rst->sym_info_len
+        - sizeof(fde_head)
+    ;
+
 
     /* malloc the memory and read the content */
-    *cipher_key = malloc(sizeof(uint8_t) * *cipher_key_len);
-    *cipher_text = malloc(sizeof(uint8_t) * *cipher_text_len);
-    fread(*cipher_key, *cipher_key_len, 1, pfde);
-    fread(*cipher_text, *cipher_text_len, 1, pfde);
+    parse_rst->crypted_key = malloc(sizeof(uint8_t) * parse_rst->crypted_key_len);
+    parse_rst->asy_info = malloc(sizeof(uint8_t) * parse_rst->asy_info_len);
+    parse_rst->sym_info = malloc(sizeof(uint8_t) * parse_rst->sym_info_len);
+    parse_rst->crypted_text = malloc(sizeof(uint8_t) * parse_rst->crypted_text_len);
+    fread(parse_rst->crypted_key, parse_rst->crypted_key_len, 1, pfde);
+    fread(parse_rst->asy_info, parse_rst->asy_info_len, 1, pfde);
+    fread(parse_rst->sym_info, parse_rst->sym_info_len, 1, pfde);
+    fread(parse_rst->crypted_text, parse_rst->crypted_text_len, 1, pfde);
 
     fclose(pfde);
 
@@ -94,4 +106,8 @@ int read_key_file(const char *key_file_path, uint8_t **key, size_t *key_len) {
     fclose(keyfile);
 
     return 0;
+}
+
+void fde_print_help() {
+    printf("this is help\n");
 }

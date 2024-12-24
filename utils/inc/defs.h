@@ -35,6 +35,7 @@
         goto exit;
 
     // error code marcos
+    #define NORMAL_EXIT         0x00000000
     #define USER_EXIT           0x00000001
     #define ERR_CONFLICT_OPT    0x00000002
     #define ERR_MULTPLE_OPT     0x00000003
@@ -49,9 +50,17 @@
     /* start of crypt_alg definations */
 
     // asymmetric encryption    - high four bits
+    const char *G_ASY_NAMES[] = {
+        "rsa"
+    };
+    #define GET_ASY_BITS(CRYPT_ALGO) ((CRYPT_ALGO) & 0xF0)
     #define ASY_RSA             0x10    /* 00010000b */
 
     // symmetric encryption     - low four bits
+    const char *G_SYM_NAMES[] = {
+        "sm4",
+    };
+    #define GET_SYM_BITS(CRYPT_ALGO) ((CRYPT_ALGO) & 0x0F)
     #define SYM_SM4             0x01    /* 00000001b */
 
     /* end of crypt_alg definations */

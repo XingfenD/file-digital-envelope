@@ -26,22 +26,26 @@
 
     /**
      * @brief the head section structure of fde file
+     * @param file_type    - 0x00 ~ 0x02: a string of 3 characters - must be "FDE"
+     * @param origin_ext   - 0x03 ~ 0x12: a string of the extension of the original filename
+     * @param crypt_alg    - 0x13 ~ 0x13: high four bits refers the asymmetric encryption, low four bits refers the symmetric encryption
+     * @param asy_info_len - 0x14 ~ 0x15: bytes-num of other infomation used in asymmetric encryption
+     * @param sym_info_len - 0x16 ~ 0x17: bytes-num of other infomation used in symmetric encryption
+     * @param sym_key_len  - 0x18 ~ 0x19: bytes-num of the encrypted symmetric key
      * @details
-     * file_type    - 0x00 ~ 0x02: a string of 3 characters - must be "FDE"
-     * origin_ext   - 0x03 ~ 0x12: a string of the extension of the original filename
-     * crypt_alg    - 0x13 ~ 0x13: high four bits refers the asymmetric encryption, low four bits refers the symmetric encryption
-     * sym_key_len  - 0x14 ~ 0x15: bytes-num of the encrypted symmetric key
-     *
      * the structure of a fde file
      *
-     * head section - this structure                                            - 22 bytes long
+     * head section - this structure                                            - 26 bytes long
      * key section  - the symmetric key ( encrypted by asymmetric encryption )  - @sym_key_len bytes long
+     * info section - the other infomation used in encrypt algorithm            - @sym_info_len + @asy_info_len bytes long
      * ciphertext   - the ciphertext encrypted by symmetric key                 - the rest bytes of the file
      */
     typedef struct _fde_head {
         uint8_t file_type[3];   /* a string of 3 characters - must be "FDE" */
-        uint8_t origin_ext[16];  /* the orgin file name' extension */
+        uint8_t origin_ext[16]; /* the orgin file name' extension */
         uint8_t crypt_alg;      /* high four bits refers the asymmetric encryption, low four bits refers the symmetric encryption */
+        uint16_t asy_info_len;  /* bytes-num of other infomation used in asymmetric encryption */
+        uint16_t sym_info_len;  /* bytes-num of other infomation used in symmetric encryption */
         uint16_t sym_key_len;   /* bytes-num of the encrypted symmetric key */
     } FDE_HEAD;
 
@@ -131,6 +135,15 @@
          * this function will add an extension to it
          */
         char *str_rep_ext(const char *origin_file_name, const char *new_ext_name);
+
+        /**
+         * @brief find a string in strArr
+         * @param[in]   str2find        the string to find
+         * @param[in]   strArr          array of strings
+         * @param[in]   size            size of the $strArr
+         * @return int - the index of $str2find in $strArr, -1 refers not found
+         */
+        // int str_find(const char str2find[], const char *strArr[], const int size);
 
     #endif /* UITILS_STR_MOD */
     /* end of advanced string function statements */
