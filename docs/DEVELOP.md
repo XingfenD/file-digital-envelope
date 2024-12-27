@@ -361,4 +361,4 @@ head section的字段在`./utils/utils.h`文件中有定义：
 | -f | -o  | -k  | -m | -h | -a | -s |
 | -- |-----|-----|----| -- | -- | -- |
 | 输入文件路径 | 输出文件路径  | 非对称密钥的文件路径 | 运行模式<br>可选值:[enc, dec] | 打印帮助 | 指定非对称加密算法 | 指定对称加密算法 |
-| 必须   | 可选，默认为文件内存储的原文件名 |    | enc将输入文件加密为数字信封<br>dec将输入的文件数字信封解密 | 打印帮助 | 可选值由./utils/inc/defs.h::G_ASY_NAMES定义 |可选值由./utils/inc/defs.h::G_SYM_NAMES定义|
+| 必须   | 可选，默认为把拓展名替换为fde文件内存储的原拓展名 |  必须  | enc将输入文件加密为数字信封<br>dec将输入的文件数字信封解密 | 打印帮助 | 可选值由./utils/inc/defs.h::G_ASY_NAMES定义 |可选值由./utils/inc/defs.h::G_SYM_NAMES定义|
