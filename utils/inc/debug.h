@@ -18,7 +18,7 @@
     /**
      * the macro to open debug print,
      * you can compile and run the project normally with the marco off
-     * and you need not comment the function calls, you will be faced at many warning messages
+     * without commenting the function calls, but you will be faced at many warning messages
      *
      * this lib encapsulate it's own format print function debug_print()
      * consequently, call debug_print() function if you want a customized output result

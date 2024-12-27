@@ -6,6 +6,15 @@
 
 但是makefile中的指令是bash指令，因此如果想要构建项目，应该在git bash中构建（在git bash中运行make命令）。
 
+### vscode插件建议
+
+- Doxygen Documentation Generator 用于自动生成文件头与函数注释，键入`/*`后回车触发
+- GitLess 可视化Git工具，可以用于对比不同commit之间的区别
+- Git Graph 可视化Git工具，以图的形式展现多个branch与commit之间的关系与变化
+- Todo Tree 列出项目中的`TODO:`，`NOTE:`等关键字
+
+注：部分插件需要手动配置。
+
 ## 英文缩写说明
 
 |        | ASY                      | SYM       | algo      |
@@ -13,7 +22,7 @@
 | 原英文 | asymmetric               | symmetric | algorithm |
 | 含义   | 非对称加密（公私钥加密） | 对称加密  | 算法      |
 
-## 头文件、源文件与函数命名规范
+## 头文件、源文件、函数命名规范与注释
 
 在这一节内，同名的.c和.h文件被称为一个模块，如`sm4.h`和`sm4.c`这一对被认为是sm4模块。
 
@@ -42,6 +51,88 @@ for example, 在sm4.h文件内：
 3. 不同的密码算法中可以有相同的模块名，单定义的全局函数不能重名 - 仍建议使用**算法名称前缀修饰模块名**以避免重名，否则很可能会出现bug
 
 具体可参考sm4算法内实现的sm4模块与sm4_sub模块。
+
+### 注释建议(非硬性要求)
+
+项目中的函数、文件头注释使用vscode插件`Doxygen Documentation Generator`自动生成
+
+#### 文件头注释
+
+文件头是在一个文件的开始处的注释，注释形如：
+
+~~~c
+/**
+ * @file ./main.c
+ * @brief the main function of FDE tool
+ * @author 2022302181113
+ * @version 1.0
+ * @date 2024-12-09
+ *
+ * @copyright Copyright (c) 2024
+ *
+ */
+~~~
+
+`@file`字段标注当前文件相对于目录的相对路径
+
+其他字段均为自动生成`@author`字段可以自己配置
+
+#### 函数接口注释
+
+函数注释在函数的声明处给出（即头文件处），如果是只在同文件内调用的静态函数，则在定义出给出。
+
+函数接口注释形如:
+
+~~~c
+    /**
+     * @brief parse the fde file head and output the @crypted_key and @crypted_text
+     * @param[in]   fde_file_path           the path to the fde file
+     * @param[out]  file_ext_name           the file extension encoded in fde file
+     * @param[out]  parse_rst               more output stored in @ref ParseRst
+     * @return int - the status code
+     * 0 - returns normally
+     *
+     * @note
+     * NOTE: the caller should malloc 17 bytes to $file_ext_name before calling
+     *
+     * NOTE: the caller should free the pointer in $parse_rst
+     *
+     * NOTE: the caller should pass address of two size_t $parse_rst->$crypted_key_len and $crypted_text_len
+     *
+     * we should malloc and asign an address to two (uint8_t*) $crypted_key and $crypted_text,
+     * conseqently, we pass the address of (uint8_t*)
+     */
+    int parse_fde_file(const char *fde_file_path, char *file_ext_name, ParseRst *parse_rst);
+~~~
+
+应当使用`@brief`指明函数的作用，`@param[in]`、`@param[out]`指明参数及其传递方向，`@return`指明函数返回值类型及意义。
+
+使用`@note`指明调用函数的注意事项，如应当给哪些变量分配多大的内存空间，在函数内部会给哪个变量分配内存空间，在函数外部需要给哪个变量释放内存空间。
+
+需要时可以指明为什么要使用该类型的参数。
+
+如果在函数注释内使用函数涉及的变量名，使用`@`或者`$`**修饰这个变量名**。
+
+
+#### 其他注释
+
+对函数功能、语句功能的注释应当使用`/* */`而不是`//`。
+
+使某一个语句不起作用的注释，使用`//`。
+
+如：
+
+~~~c
+int main () {
+    /* define a variable i */
+    int i = 0;
+
+    printf("%d\n", i); /* print i */
+    // printf("%d\n", i + 1); /* print i + 1 */
+
+    return 0; /* return */
+}
+~~~
 
 ## 项目结构
 
