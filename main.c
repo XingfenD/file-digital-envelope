@@ -24,7 +24,7 @@ int main(int argc, char *argv[]) {
     int opt;
     int mode = UN_ASSIGNED;
     int ret = NORMAL_EXIT;
-    uint8_t crypt_algo = 0x00;
+    uint8_t cipher_algo = 0x00;
     char *infile_path = NULL, *outfile_path = NULL, *keyfile_path = NULL;
 
     /* TODO: realize an advanced args parsing with dependency and exclusion */
@@ -89,14 +89,14 @@ int main(int argc, char *argv[]) {
             case 'a':
                 for (uint8_t i = 0; i < sizeof(G_ASY_NAMES) / sizeof(char*); i++) {
                     if (strcmp(optarg, G_ASY_NAMES[i]) == 0) {
-                        crypt_algo |= GET_ASY_BITS((i + 1) << 4);
+                        cipher_algo |= GET_ASY_BITS((i + 1) << 4);
                     }
                 }
                 break;
             case 's':
                 for (uint8_t i = 0; i < sizeof(G_SYM_NAMES) / sizeof(char*); i++) {
                     if (strcmp(optarg, G_ASY_NAMES[i]) == 0) {
-                        crypt_algo |= GET_SYM_BITS(i + 1);
+                        cipher_algo |= GET_SYM_BITS(i + 1);
                     }
                 }
                 break;
@@ -130,11 +130,11 @@ int main(int argc, char *argv[]) {
 
     /* encryption mode requires specifying a password algorithm */
     if (mode == ENC_MODE) {
-        if (!GET_ASY_BITS(crypt_algo)) {
+        if (!GET_ASY_BITS(cipher_algo)) {
             printf("Required parameters are not specified: -a");
             EXIT_MAIN(ERR_MISS_PARAM)
         }
-        if (!GET_SYM_BITS(crypt_algo)) {
+        if (!GET_SYM_BITS(cipher_algo)) {
             printf("Required parameters are not specified: -s");
             EXIT_MAIN(ERR_MISS_PARAM)
         }
@@ -153,8 +153,8 @@ int main(int argc, char *argv[]) {
 
     /* execute main function according to the args input */
     if (mode == ENC_MODE) {
-        uint8_t *plain_text = NULL, cipher_text = NULL;
-        uint8_t *asy_info = NULL, sym_info = NULL;
+        uint8_t *plain_text = NULL, *cipher_text = NULL;
+        uint8_t *asy_info = NULL, *sym_info = NULL;
         uint8_t *sym_key = NULL, *pub_key = NULL;
         size_t plain_text_len, cipher_text_len, pub_key_len;
         FILE *outfile = NULL;
@@ -164,20 +164,22 @@ int main(int argc, char *argv[]) {
          * @brief assign basic value to fde_head
          * [*] file_type
          * [*] origin_ext
-         * [*] crypt_alg
+         * [*] cipher_algo
          * [ ] asy_info_len
          * [ ] sym_info_len
          * [ ] sym_key_len - will be assigned in symmtric switch block
          */
-        strcpy(fde_head.file_type, "FDE");
-        fde_head.crypt_alg = crypt_algo;
+        memcpy(fde_head.file_type, "FDE", 3);
+        fde_head.cipher_algo = cipher_algo;
         char *pdot = strrchr(infile_path, '.');
-        if (NULL == pdot) {
+        if (NULL == pdot) { /* if the file does not have extension */
             for (int i = 0; i < 16; i++) {
                 fde_head.origin_ext[i] = '\0';
             }
-        } else {
-            strcpy(fde_head.origin_ext, pdot + 1);
+        } else { /* if the file does have extension */
+            /* NOTE: may have bug */
+            memcpy(fde_head.origin_ext, pdot + 1, strlen(pdot) + 1);
+            // strcpy((char *) fde_head.origin_ext, pdot + 1);
         }
 
         /* init default arg */
@@ -194,7 +196,7 @@ int main(int argc, char *argv[]) {
 
         srand((unsigned)time(NULL));
 
-        switch (GET_SYM_BITS(crypt_algo))
+        switch (GET_SYM_BITS(cipher_algo))
         {
         case SYM_SM4:
             fde_head.sym_key_len = 16;
@@ -209,7 +211,7 @@ int main(int argc, char *argv[]) {
             break;
         }
 
-        switch (GET_ASY_BITS(crypt_algo))
+        switch (GET_ASY_BITS(cipher_algo))
         {
         case ASY_RSA:
             break;
@@ -238,7 +240,7 @@ int main(int argc, char *argv[]) {
         sym_key = malloc(sizeof(uint8_t) * parse_rst.crypted_key_len);
 
         /* decrypt the key using asymmetric encrypt algorithm */
-        switch (GET_ASY_BITS(parse_rst.crypt_alg))
+        switch (GET_ASY_BITS(parse_rst.cipher_algo))
         {
         case ASY_RSA:
             /* TODO: check the return code of the functions below */
@@ -256,7 +258,7 @@ int main(int argc, char *argv[]) {
         }
 
         /* decrypt the key using symmetric encrypt algorithm */
-        switch (GET_SYM_BITS(parse_rst.crypt_alg))
+        switch (GET_SYM_BITS(parse_rst.cipher_algo))
         {
         case SYM_SM4:
             sm4_padding_decrypt(

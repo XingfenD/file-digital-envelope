@@ -6,6 +6,13 @@
 
 但是makefile中的指令是bash指令，因此如果想要构建项目，应该在git bash中构建（在git bash中运行make命令）。
 
+## 英文缩写说明
+
+|        | ASY                      | SYM       | algo      |
+| ------ | ------------------------ | --------- | --------- |
+| 原英文 | asymmetric               | symmetric | algorithm |
+| 含义   | 非对称加密（公私钥加密） | 对称加密  | 算法      |
+
 ## 头文件、源文件与函数命名规范
 
 在这一节内，同名的.c和.h文件被称为一个模块，如`sm4.h`和`sm4.c`这一对被认为是sm4模块。
@@ -42,31 +49,35 @@ for example, 在sm4.h文件内：
 file-digital-envelope
 │  .gitignore
 │  DEVELOP.md
-│  LICENCE
 │  main.c
 │  Makefile
-│  README.md
 │
 ├─crypt
-│  ├─demo_sm4
-│  └─rsa
+│  ├─rsa
+│  └─sm4
 │
-├─temp
+├─IOfile
+│      plaintext.txt
+│      template.fde
+│
 ├─test
 │      not_compile_c
-│      test_debug.c
 │      test_demo.c
 │
 └─utils
     ├─inc
     │      bin_lib.h
+    │      crypt.h
     │      debug.h
+    │      defs.h
+    │      main_callee.h
     │      table_defs.h
     │      utils.h
     │
     └─src
             bin_lib.c
             debug.c
+            main_callee.c
             utils.c
 ~~~
 
@@ -138,6 +149,18 @@ test目录下的所有*.c文件都会项目根目录下的Makefile编译为同�
 
 该文件内定义的为全局变量，应当严格遵守文件修改规范。
 
+#### main_callee.h及main_callee.c
+
+定义仅在main函数调用的main函数的子函数（为了复用部分代码以及适度简化main函数）。
+
+#### defs.h
+
+宏定义错误码，运行模式码，加密算法代码（cipher_algo字段，后文将会提及），以及相关的宏函数。
+
+#### crypt.h
+
+用于包含所有加密模块的头文件的头文件，包含了此文件即无需在main.c中包含具体加密模块的头文件。
+
 ## 文件数字信封
 
 这一节具体介绍文件数字信封的概念。
@@ -160,7 +183,7 @@ test目录下的所有*.c文件都会项目根目录下的Makefile编译为同�
 
 （用非对称算法加密的密钥长度远小于实际数据）。
 
-### PKCS#7填充模式
+### PKCS#7填充模式（实现比较容易但是最终可能不会使用这个填充方式）
 
 由于加密算法一般都是按块加密的，因此实际应用中很容易出现实际要加密的明文长度不是块的整数倍的情况。
 
@@ -191,30 +214,39 @@ head section的字段在`./utils/utils.h`文件中有定义：
 ~~~c
     /**
      * @brief the head section structure of fde file
+     * @param file_type     0x00 ~ 0x02: a string of 3 characters - must be "FDE"
+     * @param origin_ext    0x03 ~ 0x12: a string of the extension of the original filename
+     * @param cipher_algo     0x13 ~ 0x13: high four bits refers the asymmetric encryption, low four bits refers the symmetric encryption
+     * @param asy_info_len  0x14 ~ 0x15: bytes-num of other infomation used in asymmetric encryption
+     * @param sym_info_len  0x16 ~ 0x17: bytes-num of other infomation used in symmetric encryption
+     * @param sym_key_len   0x18 ~ 0x19: bytes-num of the encrypted symmetric key
+     * @param reserved      0x1A ~ 0x1F: reserved bytes for extension
      * @details
-     * file_type    - 0x00 ~ 0x02: a string of 3 characters - must be "FDE"
-     * origin_ext   - 0x03 ~ 0x13: a string of the extension of the original filename
-     * crypt_alg    - 0x13 ~ 0x13: high four bits refers the asymmetric encryption, low four bits refers the symmetric encryption
-     * sym_key_len  - 0x14 ~ 0x15: bytes-num of the encrypted symmetric key
-     *
      * the structure of a fde file
      *
-     * head section - this structure                                            - 6 bytes long
+     * head section - this structure                                            - 26 bytes long
      * key section  - the symmetric key ( encrypted by asymmetric encryption )  - @sym_key_len bytes long
+     * info section - the other infomation used in encrypt algorithm            - @sym_info_len + @asy_info_len bytes long
      * ciphertext   - the ciphertext encrypted by symmetric key                 - the rest bytes of the file
      */
     typedef struct _fde_head {
         uint8_t file_type[3];   /* a string of 3 characters - must be "FDE" */
-        uint8_t origin_ext[16];  /* the orgin file name' extension */
-        uint8_t crypt_alg;      /* high four bits refers the asymmetric encryption, low four bits refers the symmetric encryption */
+        uint8_t origin_ext[16]; /* the orgin file name' extension */
+        uint8_t cipher_algo;      /* high four bits refers the asymmetric encryption, low four bits refers the symmetric encryption */
+        uint16_t asy_info_len;  /* bytes-num of other infomation used in asymmetric encryption */
+        uint16_t sym_info_len;  /* bytes-num of other infomation used in symmetric encryption */
         uint16_t sym_key_len;   /* bytes-num of the encrypted symmetric key */
+        uint8_t reserved[6];    /* reserved for futural extension */
     } FDE_HEAD;
 ~~~
 
-1. fde文件的前3个字节，是一个固定字符串"fde", 读取fde文件时应当校验这个字段，以避免错误解析
-2. 紧接着的16个字节，存储原文件的拓展名or文件名
-3. 下一个字节crypt_alg字段，用于标注加密部分使用的算法，前4个bit用于标注使用的非对称加密算法，后4个比特用于标注对称加密算法（具体如何对应，后面再定义）
-4. 最后两个字节sym_key_len字段，用于标注被加密的密钥在该fde文件中所占字节数，为了便于读取，这里定义为uint16_t而不是uint8_t[2]
+1. fde文件的前3个字节，是一个固定字符串"fde"， 读取fde文件时应当校验这个字段，以避免错误解析
+2. 紧接着的16个字节，存储原文件的拓展名
+3. 下一个字节cipher_algo字段，用于标注加密部分使用的算法，前4个bit用于标注使用的非对称加密算法，后4个比特用于标注对称加密算法（具体如何对应在`./utils/inc/defs.h`定义）
+4. 后两个字节asy_info_len字段，用于标注`在非对称加密中使用的其他信息`在该fde文件中所占字节数，为了便于读取，这里定义为uint16_t而不是uint8_t[2]
+5. 后两个字节sym_info_len字段，用于标注`在对称加密中使用的其他信息`在该fde文件中所占字节数，也定义为uint16_t
+6. 后两个字节sym_key_len字段，用于标注被加密的密钥在该fde文件中所占字节数，也定义为uint16_t
+7. 最后一个字段reserved占6个字节，保留字段，供未来可能的拓展
 
 根据字段定义，解析（解密）一个fde文件的流程大致应如下：
 
@@ -222,8 +254,8 @@ head section的字段在`./utils/utils.h`文件中有定义：
 2. 判断文件的大小，如果大小不足sizeof(FDE_HEAD)字节则报错并退出
 3. 使用fread函数将文件的前sizeof(FDE_HEAD)个字节写入一个`FDE_HEAD`结构体中
 4. 判断file_type字段是否为"FDE"，如果不是：报错并退出
-5. 基于crypt_alg字段得出该fde文件使用的两种加密算法
-6. 基于sym_key_len字段，使用fread函数再次向后读取sym_key_len个字节，作为被加密的对称密钥
+5. 基于cipher_algo字段得出该fde文件使用的两种加密算法
+6. 基于asy_info_len，sym_info_len，sym_key_len字段，使用fread函数再次向后读取对应的字节数，并写入对应的地址
 7. 使用拥有的私钥（用户输入或读取文件）解密该对称密钥
 8. 读取文件剩下的所有字节，作为密文，使用解密出的对称密钥解密该密文
 
@@ -235,7 +267,7 @@ head section的字段在`./utils/utils.h`文件中有定义：
 
 ### 命令行参数
 
-| -f | -o  | -k  | -m | -h |
-| -- |-----|-----|----| -- |
-| 输入文件路径 | 输出文件路径  | 非对称密钥的文件路径 | 运行模式<br>可选字段:[enc, dec] | 打印帮助 |
-| 必须   | 可选，默认为文件内存储的原文件名 |    | enc将输入文件加密为数字信封<br>dec将输入的文件数字信封解密 | 打印帮助 |
+| -f | -o  | -k  | -m | -h | -a | -s |
+| -- |-----|-----|----| -- | -- | -- |
+| 输入文件路径 | 输出文件路径  | 非对称密钥的文件路径 | 运行模式<br>可选值:[enc, dec] | 打印帮助 | 指定非对称加密算法 | 指定对称加密算法 |
+| 必须   | 可选，默认为文件内存储的原文件名 |    | enc将输入文件加密为数字信封<br>dec将输入的文件数字信封解密 | 打印帮助 | 可选值由./utils/inc/defs.h::G_ASY_NAMES定义 |可选值由./utils/inc/defs.h::G_SYM_NAMES定义|

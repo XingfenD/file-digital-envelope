@@ -26,12 +26,13 @@
 
     /**
      * @brief the head section structure of fde file
-     * @param file_type    - 0x00 ~ 0x02: a string of 3 characters - must be "FDE"
-     * @param origin_ext   - 0x03 ~ 0x12: a string of the extension of the original filename
-     * @param crypt_alg    - 0x13 ~ 0x13: high four bits refers the asymmetric encryption, low four bits refers the symmetric encryption
-     * @param asy_info_len - 0x14 ~ 0x15: bytes-num of other infomation used in asymmetric encryption
-     * @param sym_info_len - 0x16 ~ 0x17: bytes-num of other infomation used in symmetric encryption
-     * @param sym_key_len  - 0x18 ~ 0x19: bytes-num of the encrypted symmetric key
+     * @param file_type     0x00 ~ 0x02: a string of 3 characters - must be "FDE"
+     * @param origin_ext    0x03 ~ 0x12: a string of the extension of the original filename
+     * @param cipher_algo     0x13 ~ 0x13: high four bits refers the asymmetric encryption, low four bits refers the symmetric encryption
+     * @param asy_info_len  0x14 ~ 0x15: bytes-num of other infomation used in asymmetric encryption
+     * @param sym_info_len  0x16 ~ 0x17: bytes-num of other infomation used in symmetric encryption
+     * @param sym_key_len   0x18 ~ 0x19: bytes-num of the encrypted symmetric key
+     * @param reserved      0x1A ~ 0x1F: reserved bytes for extension
      * @details
      * the structure of a fde file
      *
@@ -43,10 +44,11 @@
     typedef struct _fde_head {
         uint8_t file_type[3];   /* a string of 3 characters - must be "FDE" */
         uint8_t origin_ext[16]; /* the orgin file name' extension */
-        uint8_t crypt_alg;      /* high four bits refers the asymmetric encryption, low four bits refers the symmetric encryption */
+        uint8_t cipher_algo;      /* high four bits refers the asymmetric encryption, low four bits refers the symmetric encryption */
         uint16_t asy_info_len;  /* bytes-num of other infomation used in asymmetric encryption */
         uint16_t sym_info_len;  /* bytes-num of other infomation used in symmetric encryption */
         uint16_t sym_key_len;   /* bytes-num of the encrypted symmetric key */
+        uint8_t reserved[6];    /* reserved for futural extension */
     } FDE_HEAD;
 
 

@@ -67,7 +67,7 @@ int parse_fde_file(
 
     /* copy the values of the first two useful fields */
     memcpy(file_ext_name, fde_head.origin_ext, 16);
-    parse_rst->crypt_alg = fde_head.crypt_alg;
+    parse_rst->cipher_algo = fde_head.cipher_algo;
 
     /* get the length of key & text & info */
     parse_rst->crypted_key_len = (unsigned short) fde_head.sym_key_len;

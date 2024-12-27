@@ -47,22 +47,22 @@
 
     /* end of error code definations */
 
-    /* start of crypt_alg definations */
+    /* start of cipher_algo definations */
 
     // asymmetric encryption    - high four bits
-    const char *G_ASY_NAMES[] = {
+    const static char *G_ASY_NAMES[] = {
         "rsa"
     };
-    #define GET_ASY_BITS(CRYPT_ALGO) ((CRYPT_ALGO) & 0xF0)
+    #define GET_ASY_BITS(cipher_algo) ((cipher_algo) & 0xF0)
     #define ASY_RSA             0x10    /* 00010000b */
 
     // symmetric encryption     - low four bits
-    const char *G_SYM_NAMES[] = {
+    const static char *G_SYM_NAMES[] = {
         "sm4",
     };
-    #define GET_SYM_BITS(CRYPT_ALGO) ((CRYPT_ALGO) & 0x0F)
+    #define GET_SYM_BITS(cipher_algo) ((cipher_algo) & 0x0F)
     #define SYM_SM4             0x01    /* 00000001b */
 
-    /* end of crypt_alg definations */
+    /* end of cipher_algo definations */
 
 #endif /* !DEFS_H */

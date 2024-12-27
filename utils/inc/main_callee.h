@@ -18,7 +18,7 @@
 
     /**
      * @brief a struct to store output of parse_fde_file
-     * @param[out]  crypt_alg                               the field of crypt algorithm
+     * @param[out]  cipher_algo                               the field of crypt algorithm
      * @param[out]  crypted_key[length=@crypted_key_len]      the encrypted symmetric key
      * @param[out]  asy_info[length=@asy_info_len]          other infomation used in asymmetric encryption
      * @param[out]  sym_info[length=@sym_info_len]          other infomation used in symmetric encryption
@@ -33,7 +33,7 @@
      * but they should be freed by hand
      */
     typedef struct parse_rst {
-        uint8_t crypt_alg;
+        uint8_t cipher_algo;
         uint8_t *crypted_key, *asy_info, *sym_info, *crypted_text;
         unsigned short crypted_key_len, asy_info_len, sym_info_len;
         size_t crypted_text_len;
