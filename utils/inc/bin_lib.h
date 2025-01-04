@@ -30,6 +30,20 @@
     uint32_t uint32_right_loop(uint32_t uint32, int num_of_bit);
 
     /**
+     * @brief loop left shift a word for a byte
+     * @param[out]  word            the four bytes to be left shifted
+     * @param[in]   num_of_byte     the num_of_byte to left shift
+     */
+    void word_left_loop_byte(uint32_t * word, int num_of_byte);
+
+    /**
+     * @brief loop right shift a word for a byte
+     * @param[out]  word            the four bytes to be right shifted
+     * @param[in]   num_of_byte     the num_of_byte to right shift
+     */
+    void word_right_loop_byte(uint32_t * word, int num_of_byte);
+
+    /**
      * @brief compute the xor of a bytes array and a word
      * @param[in]   bytes           the bytes array
      * @param[in]   word            the word

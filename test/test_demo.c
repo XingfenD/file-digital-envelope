@@ -11,11 +11,12 @@
 
 /* you can include the module in directory:./utils and cryptographic algorithm */
 #include <utils.h>
-#include <sm4.h>
+#include <crypt.h>
 
 int main() {
     utils_print();
-    sm4_print();
+    rsa_print();
+    aes_print();
 
     return 0;
 }

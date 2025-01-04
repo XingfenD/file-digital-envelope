@@ -49,19 +49,22 @@
 
     /* start of cipher_algo definations */
 
+    #define NON_ALGO            0x00    /* 00000000b */
+
     // asymmetric encryption    - high four bits
-    const static char *G_ASY_NAMES[] = {
+    static const char *G_ASY_NAMES[] = {
         "rsa"
     };
     #define GET_ASY_BITS(cipher_algo) ((cipher_algo) & 0xF0)
     #define ASY_RSA             0x10    /* 00010000b */
 
     // symmetric encryption     - low four bits
-    const static char *G_SYM_NAMES[] = {
+    static const char *G_SYM_NAMES[] = {
         "sm4",
     };
     #define GET_SYM_BITS(cipher_algo) ((cipher_algo) & 0x0F)
     #define SYM_SM4             0x01    /* 00000001b */
+    #define SYM_AES             0x02    /* 00000010b */
 
     /* end of cipher_algo definations */
 

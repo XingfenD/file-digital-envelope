@@ -22,6 +22,38 @@ inline uint32_t uint32_right_loop(uint32_t uint32, int num_of_bit) {
     return (uint32 >> num_of_bit) | (uint32 << (32 - num_of_bit));
 }
 
+inline void word_left_loop_byte(uint32_t * word, int num_of_byte) {
+    /**
+     * assume the byte array is arr[4] = {0x01, 0x23, 0x45, 0x67}
+     * the value of pointer $word is the same as pointer $arr.
+     *
+     * if we read this address as uint32_t,
+     * it will be 0x67452301 instead of 0x01234567
+     * the address points to value 0x01
+     *
+     * to realize the left shift in byte array, we should right shift the uint32_t for 8 bits
+     * the result will be 0x01674523, the address points to value 0x23
+     *
+     * then we read this address as unsigned char[4]
+     * it will be {0x23, 0x45, 0x67, 0x01}, so we realize a left shift in byte array
+     *
+     */
+
+    // num_of_byte %= 4; /* this function shouldn't and won't be called with $num_of_byte greater than 4 */
+    *word = (*word >> 8 * num_of_byte) | (*word << (32 - 8 * num_of_byte));
+}
+
+inline void word_right_loop_byte(uint32_t * word, int num_of_byte) {
+    /**
+     * similar with the function above: word_left_loop_byte
+     * no further elaboration will be provided
+     *
+     */
+
+    // num_of_byte %= 4; /* this function shouldn't and won't be called with $num_of_byte greater than 4 */
+    *word = (*word << 8 * num_of_byte) | (*word >> (32 - 8 * num_of_byte));
+}
+
 inline uint32_t xor_uint8_uint32(const uint8_t bytes[4], const uint32_t word) {
     /**
      * assume the bytes array is bytes[4] = { 0x01, 0x23, 0x45, 0x67 }

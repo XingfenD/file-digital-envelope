@@ -9,7 +9,7 @@ int main() {
         0x08, 0x09, 0x0A, 0x0B,
         0x03, 0x03, 0x03, 0x03
     };
-    uint8_t pad[16];
+    uint8_t pad[32];
     pkcs7_padding(blocks, 16, pad);
     dbpr_uint8_arr_hex(pad, pkcs7_padded_len(16));
     // dbpr_int("parsed len", pkcs7_parsed_len(blocks, 32));

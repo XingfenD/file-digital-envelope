@@ -1,6 +1,10 @@
 build/
 
+.cache/
+
 .vscode/
+
+.zed/
 
 temp/*
 
@@ -11,3 +15,5 @@ temp/*
 *.gdbinit
 
 *.tmp
+
+compile_commands.json

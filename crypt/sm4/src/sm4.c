@@ -19,10 +19,10 @@ static uint32_t T_key(uint32_t dwa)
     a[1] = (dwa >> 16) & 0xff;
     a[2] = (dwa >> 8) & 0xff;
     a[3] = dwa & 0xff;
-    b[0] = S[a[0]];
-    b[1] = S[a[1]];
-    b[2] = S[a[2]];
-    b[3] = S[a[3]];
+    b[0] = SM4_S[a[0]];
+    b[1] = SM4_S[a[1]];
+    b[2] = SM4_S[a[2]];
+    b[3] = SM4_S[a[3]];
 
     dwt = ((uint32_t)b[0] << 24) ^ ((uint32_t)b[1] << 16) ^ ((uint32_t)b[2] << 8) ^ ((uint32_t)b[3]);
     dwb = dwt ^ (ROTL(dwt, 13)) ^ (ROTL(dwt, 23));
