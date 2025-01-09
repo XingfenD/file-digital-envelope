@@ -19,6 +19,17 @@
 #include <defs.h>
 #include <main_callee.h>
 
+const char *G_SYM_NAMES[] = {
+    "sm4",
+};
+
+const char *G_ASY_NAMES[] = {
+    "rsa"
+};
+
+const int G_SYM_NAMES_LEN = sizeof(G_SYM_NAMES) / sizeof(char*);
+const int G_ASY_NAMES_LEN = sizeof(G_ASY_NAMES) / sizeof(char*);
+
 static long get_file_size(FILE *stream) {
     long file_size = -1;
     long cur_offset = ftell(stream);	// 获取当前偏移位置

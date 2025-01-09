@@ -14,6 +14,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <time.h>
+#include <defs.h>
 
 void utils_print() {
     // TODO: this function should be removed in the final version of this project
@@ -92,17 +93,60 @@ char *str_rep_ext(const char *origin_file_name, const char *new_ext_name) {
     return ret;
 }
 
-// int str_find(const char str2find[], const char *strArr[], const int size) {
-//     int map[size];
-//     for (int i = 0; i < size; i++) {
-//         map[size] = i;
-//     }
-// }
-
 /* end of advanced string function definations */
 
 void random_bytes(uint8_t *bytes2random, int bytes_num) {
     for (int i = 0; i < bytes_num; i++) {
         bytes2random[i] = (uint8_t) (rand() % 256);
     }
+}
+
+void cbc_padding_encrypt(CBC_ENC block_enc, const size_t in_len, size_t *out_len, const uint8_t *input, void* subKeys, uint8_t **output, uint8_t *vector) {
+    /* init the variables and malloc memory */
+    *out_len = pkcs7_padded_len(in_len);
+    uint8_t *padded_input = malloc(sizeof(uint8_t) * *out_len);
+    uint8_t xor_arg[16];
+    uint8_t *encblock[16];
+    *output = malloc(sizeof(uint8_t) * *out_len);
+
+    /* pad the input bytes */
+    pkcs7_padding(input, in_len, padded_input);
+
+    /* TODO: execute sm4_cbc_encrypt process below */
+    /**
+     * related varibles
+     * @param[in]   padded_input        the bytes to encrypt in cbc mode
+     * @param[out]  *output             the encrypt result of cbc
+     * @param[in]   *out_len            both the length of @padded_input and @*output
+     * @param[in]   vector              the origin xor arg vector (iv)
+     */
+
+    memcpy(xor_arg, vector, 16);
+    size_t block_num = *out_len / 16;
+    for (size_t i = 0; i < block_num; i++) {
+        // fread(encblock, sizeof(unsigned char), 16, bin_input_file);
+        memcpy(encblock, padded_input + block_num * 16, 16);
+        ((uint32_t *) encblock)[0] ^= ((uint32_t *) xor_arg)[0];
+        ((uint32_t *) encblock)[1] ^= ((uint32_t *) xor_arg)[1];
+        ((uint32_t *) encblock)[2] ^= ((uint32_t *) xor_arg)[2];
+        ((uint32_t *) encblock)[3] ^= ((uint32_t *) xor_arg)[3];
+        block_enc(encblock, subKeys, xor_arg);
+        // fwrite(xor_arg, sizeof(unsigned char), 16, bin_output_file);
+        memcpy(*output + 16 * i, xor_arg, 16);
+    }
+
+    free(padded_input);
+}
+
+void cbc_padding_decrypt(CBC_ENC block_dec, const size_t in_len, size_t *out_len, const uint8_t *input, void* subKeys, uint8_t **output, uint8_t *vector) {
+    /* TODO: execute sm4_cbc_decrypt process below */
+    /**
+     * related varibles
+     * @param[in]   input               the bytes to decrypt in cbc mode
+     * @param[out]  output              the decrypt result of cbc
+     * @param[in]   in_len              both the length of @input and @output
+     * @param[in]   vector              the origin xor arg vector (iv)
+     */
+
+    *out_len = pkcs7_parsed_len(*output, in_len);
 }
