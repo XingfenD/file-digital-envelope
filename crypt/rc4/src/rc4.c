@@ -18,7 +18,7 @@
 void rc4_init(uint8_t *key, uint32_t key_len)
 {
     uint32_t i;
-    for( i=0; i<256; i++ )
+    for (i = 0; i < 256; i++)
     {
         RC4_S_BOX[i] = (uint8_t)i;
     }

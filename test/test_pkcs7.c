@@ -12,6 +12,6 @@ int main() {
     uint8_t pad[16];
     pkcs7_padding(blocks, 16, pad);
     dbpr_uint8_arr_hex(pad, pkcs7_padded_len(16));
-    // dbpr_int("parsed len", pkcs7_parsed_len(blocks, 32));
+    dbpr_int("parsed len", pkcs7_parsed_len(blocks, 32));
     return 0;
 }

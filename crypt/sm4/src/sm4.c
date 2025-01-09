@@ -147,22 +147,21 @@ void sm4_decrypt_block(const uint8_t *input, const uint32_t decSubKeys[SM4_ROUND
  * @param key
  */
 void sm4_padding_encrypt(
-    const uint8_t *input, uint8_t **output,
+    const uint8_t *input, uint8_t *output,
     size_t in_len, size_t *out_len,
     const uint8_t vector[16], const uint8_t key[16])
 {
     /* init the variables and malloc memory */
     *out_len = pkcs7_padded_len(in_len);
+
     uint8_t *padded_input = malloc(sizeof(uint8_t) * *out_len);
     *output = malloc(sizeof(uint8_t) * *out_len);
-
     /* pad the input bytes */
     pkcs7_padding(input, in_len, padded_input);
     enum algomode mode = SM4;
     cbc_encrypt_blocks(mode, key, vector, padded_input, (*out_len) / 16, output);
     free(padded_input);
 }
-
 
 /**
  * @brief

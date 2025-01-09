@@ -114,17 +114,19 @@ char *str_rep_ext(const char *origin_file_name, const char *new_ext_name)
 /* start of encrypt&decrypt mode function definations */
 
 /**
- * @brief 
- * @param  
- * @param  
- * @param iv 
- * @param input 
- * @param nblocks 
- * @param output 
+ * @brief
+ * @param
+ * @param
+ * @param iv
+ * @param input
+ * @param nblocks
+ * @param output
  */
 void cbc_encrypt_blocks(enum algomode mode, const *key, uint8_t *iv, const uint8_t *input, size_t nblocks, uint8_t *output)
 {
     uint32_t block_size;
+    uint8_t *pinput = input;
+    uint8_t *temp = malloc(sizeof(uint8_t) * 16);
     switch (mode)
     {
     case AES:
@@ -134,11 +136,11 @@ void cbc_encrypt_blocks(enum algomode mode, const *key, uint8_t *iv, const uint8
         {
             for (size_t i = 0; i < block_size; i++)
             {
-                output[i] = input[i] ^ iv[i];
+                temp[i] = pinput[i] ^ iv[i];
             }
-            aes_encrypt_block(key, output, output);
+            sm4_encrypt_block(temp, key, output);
             iv = output;
-            input += block_size;
+            pinput += block_size;
             output += block_size;
         }
         break;
@@ -149,45 +151,47 @@ void cbc_encrypt_blocks(enum algomode mode, const *key, uint8_t *iv, const uint8
         {
             for (size_t i = 0; i < block_size; i++)
             {
-                output[i] = input[i] ^ iv[i];
+                temp[i] = pinput[i] ^ iv[i];
             }
-            des_encrypt_block(key, output, output);
+            sm4_encrypt_block(temp, key, output);
             iv = output;
-            input += block_size;
+            pinput += block_size;
             output += block_size;
         }
         break;
     case SM4:
         block_size = 16;
+        print_bytes(pinput, 16 * 2);
         while (nblocks--)
         {
             for (size_t i = 0; i < block_size; i++)
             {
-                output[i] = input[i] ^ iv[i];
+                temp[i] = pinput[i] ^ iv[i];
             }
-            sm4_encrypt_block(key, output, output);
+            sm4_encrypt_block(temp, key, output);
             iv = output;
-            input += block_size;
+            pinput += block_size;
             output += block_size;
         }
         break;
     default:
-        error("not a valid encrypt mode");
+        break;
     }
 }
 
 /**
- * @brief 
- * @param  
- * @param  
- * @param iv 
- * @param input 
- * @param nblocks 
- * @param output 
+ * @brief
+ * @param
+ * @param
+ * @param iv
+ * @param input
+ * @param nblocks
+ * @param output
  */
 void cbc_decrypt_blocks(enum algomode mode, const *key, uint8_t *iv, const uint8_t *input, size_t nblocks, uint8_t *output)
 {
     uint32_t block_size;
+    uint8_t *pinput = input;
     switch (mode)
     {
     case AES:
@@ -195,13 +199,13 @@ void cbc_decrypt_blocks(enum algomode mode, const *key, uint8_t *iv, const uint8
         block_size = 16;
         while (nblocks--)
         {
-            aes_encrypt_block(key, input, output);
+            sm4_encrypt_block(pinput, key, output);
             for (size_t i = 0; i < block_size; i++)
             {
                 output[i] = output[i] ^ iv[i];
             }
-            iv = input;
-            input += block_size;
+            iv = pinput;
+            pinput += block_size;
             output += block_size;
         }
         break;
@@ -210,13 +214,13 @@ void cbc_decrypt_blocks(enum algomode mode, const *key, uint8_t *iv, const uint8
         block_size = 8;
         while (nblocks--)
         {
-            des_encrypt_block(key, input, output);
+            sm4_encrypt_block(pinput, key, output);
             for (size_t i = 0; i < block_size; i++)
             {
                 output[i] = output[i] ^ iv[i];
             }
-            iv = input;
-            input += block_size;
+            iv = pinput;
+            pinput += block_size;
             output += block_size;
         }
         break;
@@ -224,17 +228,17 @@ void cbc_decrypt_blocks(enum algomode mode, const *key, uint8_t *iv, const uint8
         block_size = 16;
         while (nblocks--)
         {
-            sm4_encrypt_block(key, input, output);
+            sm4_encrypt_block(pinput, key, output);
             for (size_t i = 0; i < block_size; i++)
             {
                 output[i] = output[i] ^ iv[i];
             }
-            iv = input;
-            input += block_size;
+            iv = pinput;
+            pinput += block_size;
             output += block_size;
         }
         break;
     default:
-        error("not a valid decrypt mode");
+        break;
     }
 }
