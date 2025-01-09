@@ -68,7 +68,7 @@ int* elGamal_enc(char *plaintext,int len,const char *key_filename) {
         exit(1);
     }
 
-    ElGamalKeys keys;
+    ElGamalKeys keys; 
     fscanf(key_file, "%d %d %d %d", &keys.prime_modulus, &keys.public_key_part1, &keys.public_key_part2, &keys.private_key);
     fclose(key_file);
 

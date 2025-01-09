@@ -1,5 +1,5 @@
 #include "inc/rsa.h"
-#include "inc/keys.h"
+#include <stddef.h>
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
@@ -17,45 +17,35 @@ void print_bytes(const uint8_t *data, size_t size)
 }
 
 static int RSA2048(void){
-    int ret;
-    rsa_key pk = {0};
-    rsa_key sk = {0};
-    uint8_t output[256];
+
 
     // message to encrypt
-    uint8_t input [256] = { 0x21,0x55,0x53,0x53,0x53,0x53};
+    uint8_t input [256] = "ncncncncn";
 
+    uint8_t *pub_key = NULL;
+    size_t key_len;
+    read_key_file("/home/ran/work/crypt/crypt/rsa/keys/private.bin", &pub_key, &key_len);
+
+    unsigned char output [256];
     unsigned char msg [256];
-    uint32_t outputLen, msg_len;
-    uint8_t  inputLen;
-
-    // copy keys.h message about public key and private key to the flash RAM
-    pk.bits = KEY_M_BITS;
-    memcpy(&pk.modulus         [RSA_MAX_MODULUS_LEN-sizeof(key_m) ],  key_m,  sizeof(key_m ));
-    memcpy(&pk.exponent        [RSA_MAX_MODULUS_LEN-sizeof(key_e) ],  key_e,  sizeof(key_e ));
-    sk.bits = KEY_M_BITS;
-    memcpy(&sk.modulus         [RSA_MAX_MODULUS_LEN-sizeof(key_m) ],  key_m,  sizeof(key_m ));
-    memcpy(&sk.exponent        [RSA_MAX_MODULUS_LEN-sizeof(key_pe)],  key_pe, sizeof(key_pe));
+    size_t outputLen, msg_len;
+    size_t  inputLen;
     
-
     inputLen = strlen((const char*)input);
 
-    print_bytes(input,6);
+    print_bytes(input,inputLen);
 
     // public key encrypt
-    rsa_public_encrypt(output, &outputLen, input, inputLen, &pk);
-    print_bytes(output,outputLen);
+    rsa_encrypt(input, output, inputLen, &outputLen, pub_key, key_len);
+    
+    // print_bytes(output,outputLen);
 
     // private key decrypt
-    rsa_private_decrypt(msg, &msg_len, output, outputLen, &sk);
-    printf(",,,,,,,,,,,,,,\n");
-    print_bytes(msg,msg_len);
+    rsa_decrypt(output, msg, outputLen, &msg_len, pub_key, key_len);
+    printf("%d\n",msg_len);
+    //print_bytes(msg,msg_len);
+    printf("%s\n",msg);
 
-    // private key encrypt
-   // rsa_private_encrypt(output, &outputLen, input, inputLen, &sk);
-
-    // public key decrypted
-   // rsa_public_decrypt(msg, &msg_len, output, outputLen, &pk);
 
     return 0;
 }

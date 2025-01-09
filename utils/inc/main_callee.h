@@ -45,15 +45,6 @@
         size_t *cipher_key_len, size_t *cipher_text_len
     );
 
-    /**
-     * @brief read the key file and write into a byte array
-     * @param[in]   key_file_path                           path to the key file
-     * @param[out]  key                                     the pointer to a (uint8_t*)
-     * @param[out]  key_len                                 the pointer to key_len
-     * @return int - the exit status code
-     * @note
-     * NOTE: the caller should free the memory of @key
-     */
-    int read_key_file(const char *key_file_path, uint8_t **key, size_t *key_len);
+
 
 #endif /* !MAIN_CALLEE_H */

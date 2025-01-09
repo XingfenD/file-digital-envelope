@@ -12,6 +12,7 @@
 #define RSA_H
 
 #include <stdint.h>
+#include <stddef.h>
 
 // RSA key lengths
 #define RSA_MAX_MODULUS_BITS                2048
@@ -35,11 +36,19 @@ typedef struct {
 } rsa_key;
 
 
+typedef struct
+{
+    uint32_t bits;                   /* length in bits of modulus */
+    uint8_t  modulus[256];           /* modulus */
+    uint8_t  publicExponent[4];      /* public exponent */
+    uint8_t  exponent[256];          /* private exponent */
+    uint8_t  prime[2][128];          /* prime factors */
+    uint8_t  primeExponent[2][128];  /* exponents for CRT */
+    uint8_t  coefficient[128];       /* CRT coefficient */ 
+} rsa_pkey;
 
-int rsa_public_encrypt (uint8_t *out, uint32_t *out_len, uint8_t *in, uint32_t in_len, rsa_key *pk);
-int rsa_public_decrypt (uint8_t *out, uint32_t *out_len, uint8_t *in, uint32_t in_len, rsa_key *pk);
-int rsa_private_encrypt(uint8_t *out, uint32_t *out_len, uint8_t *in, uint32_t in_len, rsa_key *sk);
-int rsa_private_decrypt(uint8_t *out, uint32_t *out_len, uint8_t *in, uint32_t in_len, rsa_key *sk);
-
+void read_key_file(const char *key_path, uint8_t **key, size_t *key_len);
+void rsa_encrypt(uint8_t *input, uint8_t *output, size_t in_len, size_t *out_len, uint8_t *key, size_t key_len);
+void rsa_decrypt(uint8_t *input, uint8_t *output, size_t in_len, size_t *out_len, uint8_t *key, size_t key_len);
 
 #endif  
