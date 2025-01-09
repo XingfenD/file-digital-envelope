@@ -34,7 +34,7 @@ void rc4_init(uint8_t *key,uint32_t key_len);
 void rc4_encrypt(uint8_t *input, size_t in_len, uint8_t *key, uint8_t *output);
 
 /**
- * @brief 
+ * @brief same with rc4_encrypt
  * @param input 
  * @param in_len 
  * @param key 

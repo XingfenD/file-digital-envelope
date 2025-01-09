@@ -2,11 +2,11 @@
  * @Author: “shoutifeng” “shoutifeng@gmail.com”
  * @Date: 2025-01-08 18:37:34
  * @LastEditors: “shoutifeng” “shoutifeng@gmail.com”
- * @LastEditTime: 2025-01-09 20:06:57
- * @FilePath: \file_digital_envelope\file-digital-envelope\crypt\rc4\test_rc4.c
+ * @LastEditTime: 2025-01-09 23:50:25
+ * @FilePath: \file_digital_envelope\file-digital-envelope\crypt\zuc\test_zuc.c
  */
 
-#include <rc4.h>
+#include <zuc.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -21,16 +21,18 @@ void print_bytes(const uint8_t *data, size_t size)
 }
 
 // Correctness test function
-void test_rc4_correctness()
+void test_zuc_correctness()
 {
+    uint8_t vector[16] = {0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef, 0xfe,
+                          0xdc, 0xba, 0x98, 0x76, 0x54, 0x32, 0x10};
     uint8_t key[16] = {0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef, 0xfe,
                        0xdc, 0xba, 0x98, 0x76, 0x54, 0x32, 0x10};
     // Fixed example plaintext 0x0123456789abcdeffedcba9876543210ff
     uint8_t plaintext[17] = {0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef, 0xfe,
                              0xdc, 0xba, 0x98, 0x76, 0x54, 0x32, 0x10, 0xff};
 
-    // Corresponding ciphertext 0xAC5BDAFC5B967A10F343EC750FBEBE3B04
-    uint8_t correctResult[17] = {0xAC, 0x5B, 0xDA, 0xFC, 0x5B, 0x96, 0x7A, 0x10, 0xF3, 0x43, 0xEC, 0x75, 0x0F, 0xBE, 0xBE, 0x3B, 0x04};
+    // Corresponding ciphertext 0x1DD73E846E2FBC001AEF9B1857034B25D5
+    uint8_t correctResult[17] = {0x1D, 0xD7, 0x3E, 0x84, 0x6E, 0x2F, 0xBC, 0x00, 0x1A, 0xEF, 0x9B, 0x18, 0x57, 0x03, 0x4B, 0x25, 0xD5};
 
     uint8_t ciphertext[17];
     uint8_t decrypted[17];
@@ -42,12 +44,12 @@ void test_rc4_correctness()
     print_bytes(correctResult, 17);
 
     // Encrypt
-    rc4_encrypt(plaintext, 17, key, ciphertext);
+    zuc_encrypt(plaintext, 17, key, vector, ciphertext);
     printf("Encrypted ciphertext: ");
     print_bytes(ciphertext, 17);
 
     // Decrypt
-    rc4_decrypt(ciphertext, 17, key, decrypted);
+    zuc_decrypt(ciphertext, 17, key, vector, decrypted);
     printf("Decrypted plaintext: ");
     print_bytes(decrypted, 17);
 
@@ -66,7 +68,7 @@ int main()
 {
     // Perform correctness test
     printf(">> Performing correctness test...\n");
-    test_rc4_correctness();
+    test_zuc_correctness();
 
     return 0;
 }

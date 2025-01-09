@@ -3,11 +3,12 @@
 #include <malloc.h>
 #include <utils.h>
 
-#define SWAP(x, y)   \
-    {                \
-        int tmp = x; \
-        x = y;       \
-        y = tmp;     \
+#define SWAP(x, y) \
+    {              \
+        int tmp;   \
+        tmp = x;   \
+        x = y;     \
+        y = tmp;   \
     }
 
 /**
@@ -39,7 +40,7 @@ void rc4_init(uint8_t *key, uint32_t key_len)
  */
 void rc4_encrypt(uint8_t *input, size_t in_len, uint8_t *key, uint8_t *output)
 {
-    rc4_init(key, 256);
+    rc4_init(key, 16);
     uint32_t i = 0, j = 0;
     uint8_t k[256];
     for (size_t n = 0; n < in_len; n++)
@@ -51,6 +52,7 @@ void rc4_encrypt(uint8_t *input, size_t in_len, uint8_t *key, uint8_t *output)
         k[n] = RC4_S_BOX[(RC4_S_BOX[i] + RC4_S_BOX[j]) % 256];
         output[n] = input[n] ^ k[n];
     }
+    // print_bytes(k, 17);
 }
 
 /**
@@ -61,7 +63,7 @@ void rc4_encrypt(uint8_t *input, size_t in_len, uint8_t *key, uint8_t *output)
  */
 void rc4_decrypt(uint8_t *input, size_t in_len, uint8_t *key, uint8_t *output)
 {
-    rc4_init(key, 256);
+    rc4_init(key, 16);
     uint32_t i = 0, j = 0;
     uint8_t k[256];
     for (size_t n = 0; n < in_len; n++)
@@ -73,4 +75,5 @@ void rc4_decrypt(uint8_t *input, size_t in_len, uint8_t *key, uint8_t *output)
         k[n] = RC4_S_BOX[(RC4_S_BOX[i] + RC4_S_BOX[j]) % 256];
         output[n] = input[n] ^ k[n];
     }
+    // print_bytes(k, 17);
 }
