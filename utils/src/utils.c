@@ -161,7 +161,6 @@ void cbc_encrypt_blocks(enum algomode mode, const *key, uint8_t *iv, const uint8
         break;
     case SM4:
         block_size = 16;
-        print_bytes(pinput, 16 * 2);
         while (nblocks--)
         {
             for (size_t i = 0; i < block_size; i++)
