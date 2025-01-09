@@ -13,13 +13,3 @@ openssl   base64  -d  -in private.pem -out private.bin
 运行`./keys/gen_keys.sh`即可获得密钥对
 
 
-## 代码相关
-在`./src/read_pem_file.c`的第45行和第64行
-
-```c
-//45
-if(fopen("/home/ran/work/crypt/crypt/rsa/keys/private.bin", "r"))
-//64
-flie_buffer = copyFile("/home/ran/work/crypt/crypt/rsa/keys/private.bin", &file_size);
-```
-文件路径需要改为自己的路径`/your/path/to/crypt/rsa/keys/private.bin`
