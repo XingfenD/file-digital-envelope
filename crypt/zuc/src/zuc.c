@@ -97,7 +97,7 @@ void zuc_init(const uint8_t *key, const uint8_t *iv)
     uint32_t X0, X1, X2, X3;
     for (i = 0; i < 16; i++)
     {
-        LFSR[i] = MAKEU31(key[i], KD[i], iv[i]);
+        LFSR[i] = MAKEU31(key[i], ZUC_KD[i], iv[i]);
     }
     /* R1 R2的初始化 */
     R1 = 0;
