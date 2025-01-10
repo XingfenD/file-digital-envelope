@@ -28,10 +28,10 @@ clean:
 .PHONY: clean
 
 $(TEST_EXEC): $(OBJECTS) $(UTILS_OBJ) $(BUILD_DIR)/test.o | $(BIN_DIR)
-	$(CC) $(CFLAGS) -o $@ $^
+	$(CC) $(LDFLAGS) -o $@ $^
 
-# ↓↓↓↓↓↓↓↓↓↓↓ 将此处测试文件名修改为你的测试文件名
-$(BUILD_DIR)/test.o: ./test_sm4.c $(BUILD_DIR)
+#                     ↓↓↓↓↓↓↓↓↓↓↓   将此处测试文件名修改为你的测试文件名
+$(BUILD_DIR)/test.o: ./test_rsa.c $(BUILD_DIR)
 	$(CC) $(CFLAGS) -c -o $@ $<
 
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.c | $(BUILD_DIR)
