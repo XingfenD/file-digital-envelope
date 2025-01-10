@@ -19,12 +19,12 @@ extern "C"
     uint32_t R2;
 
     /**
-     * @brief 
-     * @param key 
-     * @param iv 
+     * @brief
+     * @param key
+     * @param iv
      */
     void zuc_init(const uint8_t *key, const uint8_t *iv);
-    
+
     /**
      * @brief generate keyword
      * @return keyword
@@ -56,7 +56,7 @@ extern "C"
      * @param iv initialization vector
      * @param output output data
      */
-    void zuc_encrypt(const uint8_t *input, size_t inlen, const uint8_t *key, const uint8_t *iv, uint8_t *output);
+    void zuc_decrypt(const uint8_t *input, size_t inlen, const uint8_t *key, const uint8_t *iv, uint8_t *output);
 
 #ifdef __cplusplus
 }

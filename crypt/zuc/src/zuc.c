@@ -11,17 +11,17 @@
 
 #define L1(X)         \
     ((X) ^            \
-     ROT32((X), 2) ^  \
-     ROT32((X), 10) ^ \
-     ROT32((X), 18) ^ \
-     ROT32((X), 24))
+    ROT32((X), 2) ^   \
+    ROT32((X), 10) ^  \
+    ROT32((X), 18) ^  \
+    ROT32((X), 24))
 
 #define L2(X)         \
     ((X) ^            \
-     ROT32((X), 8) ^  \
-     ROT32((X), 14) ^ \
-     ROT32((X), 22) ^ \
-     ROT32((X), 30))
+    ROT32((X), 8) ^   \
+    ROT32((X), 14) ^  \
+    ROT32((X), 22) ^  \
+    ROT32((X), 30))
 
 #define LFSRWithInitialisationMode(u) \
     v = LFSR[0];                      \
@@ -64,14 +64,14 @@
 
 #define MAKEU31(k, d, iv)    \
     (((uint32_t)(k) << 23) | \
-     ((uint32_t)(d) << 8) |  \
-     (uint32_t)(iv))
+    ((uint32_t)(d) << 8) |   \
+    (uint32_t)(iv))
 
 #define MAKEU32(a, b, c, d)  \
     (((uint32_t)(a) << 24) | \
-     ((uint32_t)(b) << 16) | \
-     ((uint32_t)(c) << 8) |  \
-     ((uint32_t)(d)))
+    ((uint32_t)(b) << 16) |  \
+    ((uint32_t)(c) << 8) |   \
+    ((uint32_t)(d)))
 
 #define GETU32(p) (((uint32_t)(p)[0] << 24) ^ ((uint32_t)(p)[1] << 16) ^ ((uint32_t)(p)[2] << 8) ^ ((uint32_t)(p)[3]))
 #define PUTU32(p, v)                   \
