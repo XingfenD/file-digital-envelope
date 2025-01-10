@@ -72,7 +72,7 @@ int parse_fde_file(
     /* get the length of key & text & info */
     parse_rst->crypted_key_len = (unsigned short) fde_head.sym_key_len;
     parse_rst->asy_info_len = (unsigned short) fde_head.asy_info_len;
-    parse_rst->sym_info_len = (unsigned short) fde_head.sym_key_len;
+    parse_rst->sym_info_len = (unsigned short) fde_head.sym_info_len;
     parse_rst->crypted_text_len =
         file_size
         - parse_rst->crypted_key_len

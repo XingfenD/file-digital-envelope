@@ -214,14 +214,14 @@ int main(int argc, char *argv[]) {
         switch (GET_SYM_BITS(cipher_algo))
         {
         case SYM_SM4:
-            fde_head.sym_key_len = 16;
+            // fde_head.sym_key_len = 16;
             fde_head.sym_info_len = 16;
             sym_info = malloc(fde_head.sym_info_len * sizeof(uint8_t));
-            sym_key = malloc(fde_head.sym_key_len * sizeof(uint8_t));
+            sym_key = malloc(16 * sizeof(uint8_t));
             random_bytes(sym_info, fde_head.sym_info_len);
-            random_bytes(sym_key, fde_head.sym_key_len);
+            random_bytes(sym_key, 16);
 
-            dbpr_uint8_arr_hex(sym_key, fde_head.sym_key_len);
+            dbpr_uint8_arr_hex(sym_key, 16);
             dbpr_uint8_arr_hex(sym_info, 16);
 
             sm4_padding_encrypt(
@@ -231,12 +231,12 @@ int main(int argc, char *argv[]) {
             );
             break;
         case SYM_AES:
-            fde_head.sym_key_len = 16;
+            // fde_head.sym_key_len = 16;
             fde_head.sym_info_len = 16;
             sym_info = malloc(fde_head.sym_info_len * sizeof(uint8_t));
-            sym_key = malloc(fde_head.sym_key_len * sizeof(uint8_t));
+            sym_key = malloc(16 * sizeof(uint8_t));
             random_bytes(sym_info, fde_head.sym_info_len);
-            random_bytes(sym_key, fde_head.sym_key_len);
+            random_bytes(sym_key, 16);
             aes_padding_encrypt(
                 plain_text, &cipher_text,
                 plain_text_len, &cipher_text_len,
@@ -250,15 +250,16 @@ int main(int argc, char *argv[]) {
         switch (GET_ASY_BITS(cipher_algo))
         {
         case ASY_RSA:
-            cipher_sym_key = malloc(256 * sizeof(uint8_t));
-            rsa_encrypt(sym_key, cipher_sym_key, fde_head.sym_key_len, &cipher_sym_key_len, pub_key, pub_key_len);
+            fde_head.sym_key_len = 256;
+            cipher_sym_key = malloc(fde_head.sym_key_len * sizeof(uint8_t));
+            rsa_encrypt(sym_key, cipher_sym_key, 16, &cipher_sym_key_len, pub_key, pub_key_len);
             break;
         }
 
 
         outfile = fopen(outfile_path, "wb");
         fwrite(&fde_head, 1, sizeof(fde_head), outfile);
-        fwrite(cipher_sym_key, 1, fde_head.sym_key_len, outfile);
+        fwrite(cipher_sym_key, 1, 256, outfile);
         fwrite(asy_info, 1, fde_head.asy_info_len, outfile);
         fwrite(sym_info, 1, fde_head.sym_info_len, outfile);
         fwrite(cipher_text, 1, cipher_text_len, outfile);
@@ -294,7 +295,6 @@ int main(int argc, char *argv[]) {
             /* TODO: check the return code of the functions below */
             /* decrypt the sym-key */
             read_bin_file(keyfile_path, &pub_key, &pub_key_len);
-            dbpr_uint8_arr_hex(parse_rst.crypted_key, 16);
             dbpr_uint8_arr_hex(sym_key, 16);
             rsa_decrypt(
                 parse_rst.crypted_key, sym_key,
@@ -336,7 +336,7 @@ int main(int argc, char *argv[]) {
 
         FILE *outfile = fopen(outfile_path, "wb");
         fwrite(decrypt_text, sizeof(uint8_t), decrypt_text_len, outfile);
-        free(outfile);
+        fclose(outfile);
 
         free(decrypt_text); /* malloced in main after parse_fde_file() */
         free(sym_key); /* malloced in after parse_fde_file() */

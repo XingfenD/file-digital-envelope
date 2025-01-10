@@ -44,10 +44,10 @@ all: $(MAIN_EXEC)
 remake: clean | all
 
 test-enc: all
-	$(MAIN_EXEC) -m enc -f ./IOfile/plaintext.txt -o ./IOfile/enc_rst.fde -k ./IOfile/private.bin -a rsa -s sm4
+	$(MAIN_EXEC) -m enc -f ./IOfile/plaintext.txt -o ./IOfile/enc_rst.fde -k ./IOfile/public.bin -a rsa -s sm4
 
 test-dec: all
-	$(MAIN_EXEC) -m dec -f ./IOfile/enc_rst.fde -k ./IOfile/private.bin
+	$(MAIN_EXEC) -m dec -f ./IOfile/enc_rst.fde -k ./IOfile/private.bin -o ./IOfile/dec_rst.txt
 
 release: CFLAGS += -O3
 release: INCLUDES += $(addprefix -I, $(CRYPTS_INC_DIRS)) -I$(UTILS_INC_DIR)
