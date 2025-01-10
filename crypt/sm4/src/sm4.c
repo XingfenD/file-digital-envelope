@@ -151,7 +151,7 @@ void sm4_padding_encrypt(
     size_t in_len, size_t *out_len,
     const uint8_t vector[16], const uint8_t key[16]
 ) {
-    uint8_t enc_subkeys[32];
+    uint32_t enc_subkeys[32];
     sm4_make_enc_subkeys(key, enc_subkeys);
     cbc_padding_encrypt(&sm4_encrypt_block, in_len, out_len, input, enc_subkeys, output, vector);
 }
@@ -170,7 +170,7 @@ void sm4_padding_decrypt(
     size_t in_len, size_t *out_len,
     const uint8_t vector[16], const uint8_t key[16]
 ) {
-    uint8_t dec_subkeys[32];
+    uint32_t dec_subkeys[32];
     sm4_make_dec_subkeys(key, dec_subkeys);
     cbc_padding_decrypt(&sm4_decrypt_block, in_len, out_len, input, dec_subkeys, output, vector);
 }

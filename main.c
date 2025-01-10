@@ -18,6 +18,18 @@
 #include <crypt.h>
 #include <time.h>
 #include <stdlib.h>
+#include <debug.h>
+
+const char *G_SYM_NAMES[] = {
+    "sm4", "aes", "rc4", "zuc"
+};
+
+const char *G_ASY_NAMES[] = {
+    "rsa"
+};
+
+const int G_SYM_NAMES_LEN = sizeof(G_SYM_NAMES) / sizeof(char*);
+const int G_ASY_NAMES_LEN = sizeof(G_ASY_NAMES) / sizeof(char*);
 
 /* TODO: reconstruct the main function */
 int main(int argc, char *argv[]) {
@@ -29,7 +41,7 @@ int main(int argc, char *argv[]) {
 
     /* TODO: realize an advanced args parsing with dependency and exclusion */
     /* parse the command line input */
-    while ((opt = getopt(argc, argv, "f:o:k:m:h:a:s")) != -1) {
+    while ((opt = getopt(argc, argv, "f:o:k:m:a:s:h")) != -1) {
         switch (opt) {
             case 'f':
                 if (infile_path == NULL) {
@@ -95,7 +107,7 @@ int main(int argc, char *argv[]) {
                 break;
             case 's':
                 for (uint8_t i = 0; i < G_SYM_NAMES_LEN; i++) {
-                    if (strcmp(optarg, G_ASY_NAMES[i]) == 0) {
+                    if (strcmp(optarg, G_SYM_NAMES[i]) == 0) {
                         cipher_algo |= GET_SYM_BITS(i + 1);
                     }
                 }
@@ -158,6 +170,7 @@ int main(int argc, char *argv[]) {
         uint8_t *sym_key = NULL, *pub_key = NULL;
         uint8_t *cipher_sym_key = NULL;
         size_t plain_text_len, cipher_text_len, pub_key_len;
+        size_t cipher_sym_key_len;
         FILE *outfile = NULL;
         FDE_HEAD fde_head = {};
 
@@ -207,6 +220,10 @@ int main(int argc, char *argv[]) {
             sym_key = malloc(fde_head.sym_key_len * sizeof(uint8_t));
             random_bytes(sym_info, fde_head.sym_info_len);
             random_bytes(sym_key, fde_head.sym_key_len);
+
+            dbpr_uint8_arr_hex(sym_key, fde_head.sym_key_len);
+            dbpr_uint8_arr_hex(sym_info, 16);
+
             sm4_padding_encrypt(
                 plain_text, &cipher_text,
                 plain_text_len, &cipher_text_len,
@@ -233,8 +250,8 @@ int main(int argc, char *argv[]) {
         switch (GET_ASY_BITS(cipher_algo))
         {
         case ASY_RSA:
-            cipher_sym_key = malloc(fde_head.sym_key_len * sizeof(uint8_t));
-            rsa_encrypt(sym_key, cipher_sym_key, fde_head.sym_key_len, NULL, pub_key, pub_key_len);
+            cipher_sym_key = malloc(256 * sizeof(uint8_t));
+            rsa_encrypt(sym_key, cipher_sym_key, fde_head.sym_key_len, &cipher_sym_key_len, pub_key, pub_key_len);
             break;
         }
 
@@ -277,11 +294,14 @@ int main(int argc, char *argv[]) {
             /* TODO: check the return code of the functions below */
             /* decrypt the sym-key */
             read_bin_file(keyfile_path, &pub_key, &pub_key_len);
-            rsa_encrypt(
+            dbpr_uint8_arr_hex(parse_rst.crypted_key, 16);
+            dbpr_uint8_arr_hex(sym_key, 16);
+            rsa_decrypt(
                 parse_rst.crypted_key, sym_key,
                 parse_rst.crypted_key_len, &sym_key_len,
                 pub_key, pub_key_len
             );
+            dbpr_uint8_arr_hex(sym_key, 16);
             // sym_key_len = parse_rst.crypted_key_len;
             break;
 

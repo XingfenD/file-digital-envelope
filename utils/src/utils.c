@@ -139,7 +139,7 @@ void cbc_padding_encrypt(CBC_ENC block_enc, const size_t in_len, size_t *out_len
     free(padded_input);
 }
 
-void cbc_padding_decrypt(CBC_ENC block_dec, const size_t in_len, size_t *out_len, const uint8_t *input, void* subKeys, uint8_t **output, uint8_t *vector) {
+void cbc_padding_decrypt(CBC_ENC block_dec, const size_t in_len, size_t *out_len, const uint8_t *input, void* subKeys, uint8_t *output, uint8_t *vector) {
     /* TODO: execute sm4_cbc_decrypt process below */
     /**
      * related varibles
@@ -158,7 +158,7 @@ void cbc_padding_decrypt(CBC_ENC block_dec, const size_t in_len, size_t *out_len
     block2write = output;
     memcpy(xor_arg, vector, 16);
 
-    for (int i = 0; i < block_num; i++) {
+    for (size_t i = 0; i < block_num; i++) {
         (*block_dec) (block2dec, subKeys, block2write);
 
         ((uint32_t *) block2write)[0] ^= ((uint32_t *) xor_arg)[0];
@@ -171,7 +171,7 @@ void cbc_padding_decrypt(CBC_ENC block_dec, const size_t in_len, size_t *out_len
         block2write += 16;
     }
 
-    *out_len = pkcs7_parsed_len(*output, in_len);
+    *out_len = pkcs7_parsed_len(output, in_len);
 }
 
 

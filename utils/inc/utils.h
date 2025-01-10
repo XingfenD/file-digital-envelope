@@ -187,6 +187,6 @@
     void cbc_padding_encrypt(CBC_ENC block_enc, const size_t in_len, size_t *out_len, const uint8_t *input, void* subKeys, uint8_t **output, uint8_t *vector);
 
 
-    void cbc_padding_decrypt(CBC_ENC block_dec, const size_t in_len, size_t *out_len, const uint8_t *input, void* subKeys, uint8_t **output, uint8_t *vector);
+    void cbc_padding_decrypt(CBC_ENC block_dec, const size_t in_len, size_t *out_len, const uint8_t *input, void* subKeys, uint8_t *output, uint8_t *vector);
 
 #endif /* !UTILS_H */
