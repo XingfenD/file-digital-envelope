@@ -231,7 +231,6 @@ int main(int argc, char *argv[]) {
             );
             break;
         case SYM_AES:
-            // fde_head.sym_key_len = 16;
             fde_head.sym_info_len = 16;
             sym_info = malloc(fde_head.sym_info_len * sizeof(uint8_t));
             sym_key = malloc(16 * sizeof(uint8_t));
@@ -241,6 +240,30 @@ int main(int argc, char *argv[]) {
                 plain_text, &cipher_text,
                 plain_text_len, &cipher_text_len,
                 sym_info, sym_key
+            );
+            break;
+        case SYM_RC4:
+            fde_head.sym_info_len = 0;
+            // sym_info = malloc(fde_head.sym_info_len * sizeof(uint8_t));
+            cipher_text = malloc(plain_text_len * sizeof(uint8_t));
+            sym_key = malloc(16 * sizeof(uint8_t));
+            // random_bytes(sym_info, fde_head.sym_info_len);
+            random_bytes(sym_key, 16);
+            rc4_encrypt(
+                plain_text, plain_text_len,
+                sym_key, cipher_text
+            );
+            break;
+        case SYM_ZUC:
+            fde_head.sym_info_len = 16;
+            sym_info = malloc(fde_head.sym_info_len * sizeof(uint8_t));
+            sym_key = malloc(16 * sizeof(uint8_t));
+            cipher_text = malloc(plain_text_len * sizeof(uint8_t));
+            random_bytes(sym_info, fde_head.sym_info_len);
+            random_bytes(sym_key, 16);
+            zuc_encrypt(
+                plain_text, plain_text_len,
+                sym_key, sym_info, cipher_text
             );
             break;
         default:
@@ -324,6 +347,14 @@ int main(int argc, char *argv[]) {
                 parse_rst.sym_info, sym_key
             );
             break;
+        case SYM_RC4:
+            rc4_decrypt(
+                parse_rst.crypted_text, parse_rst.crypted_text_len,
+                sym_key, decrypt_text
+            );
+            break;
+        case SYM_ZUC:
+            zuc_decrypt(parse_rst.crypted_text, parse_rst.crypted_text_len, sym_key, parse_rst.sym_info, decrypt_text);
         }
 
         /* write the decrypt result to output file */
