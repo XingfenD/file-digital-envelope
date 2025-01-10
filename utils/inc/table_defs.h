@@ -457,17 +457,4 @@
     /* ending of the tables defination used in zuc */
 
 
-    /* beginning of the tables defination used in rsa */
-    /* function names in this module start with RSA_ */
-    #ifdef TABLES_RSA_MOD
-        #error "Macro TABLES_RSA_MOD already defined"
-    #endif /* TABLES_RSA_MOD */
-    #define TABLES_RSA_MOD
-    #ifdef TABLES_RSA_MOD
-
-        /* add the defination of tables used in rsa here */
-
-    #endif /* TABLES_RSA_MOD */
-    /* ending of the tables defination used in rsa */
-
 #endif /* !TABLE_DEFS_H */

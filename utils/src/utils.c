@@ -132,7 +132,7 @@ void cbc_padding_encrypt(CBC_ENC block_enc, const size_t in_len, size_t *out_len
         ((uint32_t *) encblock)[1] ^= ((uint32_t *) xor_arg)[1];
         ((uint32_t *) encblock)[2] ^= ((uint32_t *) xor_arg)[2];
         ((uint32_t *) encblock)[3] ^= ((uint32_t *) xor_arg)[3];
-        block_enc(encblock, subKeys, xor_arg);
+        (*block_enc) (encblock, subKeys, xor_arg);
         // fwrite(xor_arg, sizeof(unsigned char), 16, bin_output_file);
         memcpy(*output + 16 * i, xor_arg, 16);
     }
@@ -156,7 +156,7 @@ void cbc_padding_decrypt(CBC_ENC block_dec, const size_t in_len, size_t *out_len
 
 /* start of encrypt&decrypt mode function definations */
 
-void cbc_encrypt_blocks(enum algomode mode, const *key, uint8_t *iv, const uint8_t *input, size_t nblocks, uint8_t *output)
+void cbc_encrypt_blocks(enum algomode mode, const void *key, uint8_t *iv, const uint8_t *input, size_t nblocks, uint8_t *output)
 {
     uint32_t block_size;
     uint8_t *pinput = input;
@@ -212,7 +212,7 @@ void cbc_encrypt_blocks(enum algomode mode, const *key, uint8_t *iv, const uint8
     }
 }
 
-void cbc_decrypt_blocks(enum algomode mode, const *key, uint8_t *iv, const uint8_t *input, size_t nblocks, uint8_t *output)
+void cbc_decrypt_blocks(enum algomode mode, const uint8_t *key, uint8_t *iv, const uint8_t *input, size_t nblocks, uint8_t *output)
 {
     uint32_t block_size;
     uint8_t *pinput = input;

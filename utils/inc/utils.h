@@ -161,8 +161,8 @@
                 SM4,
             };
         #ifdef cbc_mode
-            void cbc_encrypt_blocks(enum algomode mode,const *key, uint8_t *iv, const uint8_t *input, size_t nblocks, uint8_t *out);
-            void cbc_decrypt_blocks(enum algomode mode, const *key, uint8_t *iv, const uint8_t *input, size_t nblocks, uint8_t *output);
+            void cbc_encrypt_blocks(enum algomode mode,const void *key, uint8_t *iv, const uint8_t *input, size_t nblocks, uint8_t *out);
+            void cbc_decrypt_blocks(enum algomode mode, const void *key, uint8_t *iv, const uint8_t *input, size_t nblocks, uint8_t *output);
         #endif
     #endif
     /**

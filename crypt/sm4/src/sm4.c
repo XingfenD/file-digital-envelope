@@ -147,7 +147,7 @@ void sm4_decrypt_block(const uint8_t *input, const uint32_t decSubKeys[SM4_ROUND
  * @param key
  */
 void sm4_padding_encrypt(
-    const uint8_t *input, uint8_t *output,
+    const uint8_t *input, uint8_t **output,
     size_t in_len, size_t *out_len,
     const uint8_t vector[16], const uint8_t key[16]
 ) {

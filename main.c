@@ -246,12 +246,12 @@ int main(int argc, char *argv[]) {
             /* TODO: check the return code of the functions below */
             /* decrypt the sym-key */
             read_bin_file(keyfile_path, &pub_key, &pub_key_len);
-            rsa_padding_decrypt(
+            rsa_encrypt(
                 parse_rst.crypted_key, sym_key,
-                parse_rst.crypted_key_len,
+                parse_rst.crypted_key_len, &sym_key_len,
                 pub_key, pub_key_len
             );
-            sym_key_len = parse_rst.crypted_key_len;
+            // sym_key_len = parse_rst.crypted_key_len;
             break;
         default:
             break;

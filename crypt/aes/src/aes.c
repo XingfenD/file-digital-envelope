@@ -13,6 +13,7 @@
 #include <aes.h>
 #include <bin_lib.h>
 #include <aes_sub.h>
+#include <utils.h>
 #include <malloc.h>
 #include <table_defs.h>
 #include <stdio.h>

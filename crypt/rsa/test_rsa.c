@@ -24,20 +24,20 @@ static int RSA2048(void){
 
     uint8_t *pub_key = NULL;
     size_t key_len;
-    read_key_file("/home/ran/work/crypt/crypt/rsa/keys/private.bin", &pub_key, &key_len);
+    read_key_file("D:\\Project\\psd-lab\\file-digital-envelope\\crypt\\rsa\\keys\\private.bin", &pub_key, &key_len);
 
     unsigned char output [256];
     unsigned char msg [256];
     size_t outputLen, msg_len;
     size_t  inputLen;
-    
+
     inputLen = strlen((const char*)input);
 
     print_bytes(input,inputLen);
 
     // public key encrypt
     rsa_encrypt(input, output, inputLen, &outputLen, pub_key, key_len);
-    
+
     // print_bytes(output,outputLen);
 
     // private key decrypt

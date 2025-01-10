@@ -73,7 +73,7 @@ extern "C"
      * consequently, the caller of this function should pass the pointer of @output,
      * so can the function malloc the memory in it (call the function:./utils::pkcs7_padded_len)
      */
-    void sm4_padding_encrypt(const uint8_t *input, uint8_t *output, size_t in_len, size_t *out_len, const uint8_t vector[16], const uint8_t key[16]);
+    void sm4_padding_encrypt(const uint8_t *input, uint8_t **output, size_t in_len, size_t *out_len, const uint8_t vector[16], const uint8_t key[16]);
 
     /**
      * @brief SM4 decrypt arbitrary length

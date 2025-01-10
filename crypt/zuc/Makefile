@@ -21,8 +21,8 @@ all: $(TEST_EXEC)
 
 # rmdir /S /Q build
 clean:
-	rm -rf build
 	rm -rf $(UTILS_OBJ)
+	rm -rf build
 
 .PHONY: clean
 

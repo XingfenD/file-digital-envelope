@@ -24,42 +24,42 @@
     ROT32((X), 30))
 
 #define LFSRWithInitialisationMode(u) \
-    v = LFSR[0];                      \
-    ADD31(v, ROT31(LFSR[0], 8));      \
-    ADD31(v, ROT31(LFSR[4], 20));     \
-    ADD31(v, ROT31(LFSR[10], 21));    \
-    ADD31(v, ROT31(LFSR[13], 17));    \
-    ADD31(v, ROT31(LFSR[15], 15));    \
+    v = ZUC_LFSR[0];                      \
+    ADD31(v, ROT31(ZUC_LFSR[0], 8));      \
+    ADD31(v, ROT31(ZUC_LFSR[4], 20));     \
+    ADD31(v, ROT31(ZUC_LFSR[10], 21));    \
+    ADD31(v, ROT31(ZUC_LFSR[13], 17));    \
+    ADD31(v, ROT31(ZUC_LFSR[15], 15));    \
     ADD31(v, (u));                    \
     {                                 \
         int j;                        \
         for (j = 0; j < 15; j++)      \
-            LFSR[j] = LFSR[j + 1];    \
+            ZUC_LFSR[j] = ZUC_LFSR[j + 1];    \
     }                                 \
-    LFSR[15] = v
+    ZUC_LFSR[15] = v
 
 #define LFSRWithWorkMode()                            \
     {                                                 \
         int j;                                        \
-        uint64_t a = LFSR[0];                         \
-        a += ((uint64_t)LFSR[0]) << 8;                \
-        a += ((uint64_t)LFSR[4]) << 20;               \
-        a += ((uint64_t)LFSR[10]) << 21;              \
-        a += ((uint64_t)LFSR[13]) << 17;              \
-        a += ((uint64_t)LFSR[15]) << 15;              \
+        uint64_t a = ZUC_LFSR[0];                         \
+        a += ((uint64_t)ZUC_LFSR[0]) << 8;                \
+        a += ((uint64_t)ZUC_LFSR[4]) << 20;               \
+        a += ((uint64_t)ZUC_LFSR[10]) << 21;              \
+        a += ((uint64_t)ZUC_LFSR[13]) << 17;              \
+        a += ((uint64_t)ZUC_LFSR[15]) << 15;              \
         a = (a & 0x7fffffff) + (a >> 31);             \
         v = (uint32_t)((a & 0x7fffffff) + (a >> 31)); \
         for (j = 0; j < 15; j++)                      \
-            LFSR[j] = LFSR[j + 1];                    \
-        LFSR[15] = v;                                 \
+            ZUC_LFSR[j] = ZUC_LFSR[j + 1];                    \
+        ZUC_LFSR[15] = v;                                 \
     }
 
 #define BitReconstruction(X0, X1, X2, X3)                          \
     {                                                              \
-        X0 = ((LFSR[15] & 0x7fff8000) << 1) | (LFSR[14] & 0xffff); \
-        X1 = (LFSR[11] << 16) | (LFSR[9] >> 15);                   \
-        X2 = (LFSR[7] << 16) | (LFSR[5] >> 15);                    \
-        X3 = (LFSR[2] << 16) | (LFSR[0] >> 15);                    \
+        X0 = ((ZUC_LFSR[15] & 0x7fff8000) << 1) | (ZUC_LFSR[14] & 0xffff); \
+        X1 = (ZUC_LFSR[11] << 16) | (ZUC_LFSR[9] >> 15);                   \
+        X2 = (ZUC_LFSR[7] << 16) | (ZUC_LFSR[5] >> 15);                    \
+        X3 = (ZUC_LFSR[2] << 16) | (ZUC_LFSR[0] >> 15);                    \
     }
 
 #define MAKEU31(k, d, iv)    \
@@ -83,13 +83,13 @@
     }
 
 #define F(X0, X1, X2)                                                                                   \
-    (X0 ^ R1) + R2;                                                                                     \
-    W1 = R1 + X1;                                                                                       \
-    W2 = R2 ^ X2;                                                                                       \
+    ((X0 ^ ZUC_R1) + ZUC_R2);                                                                                     \
+    W1 = ZUC_R1 + X1;                                                                                       \
+    W2 = ZUC_R2 ^ X2;                                                                                       \
     u = L1((W1 << 16) | (W2 >> 16));                                                                    \
     v = L2((W2 << 16) | (W1 >> 16));                                                                    \
-    R1 = MAKEU32(ZUC_S0[u >> 24], ZUC_S1[(u >> 16) & 0xFF], ZUC_S0[(u >> 8) & 0xFF], ZUC_S1[u & 0xFF]); \
-    R2 = MAKEU32(ZUC_S0[v >> 24], ZUC_S1[(v >> 16) & 0xFF], ZUC_S0[(v >> 8) & 0xFF], ZUC_S1[v & 0xFF]);
+    ZUC_R1 = MAKEU32(ZUC_S0[u >> 24], ZUC_S1[(u >> 16) & 0xFF], ZUC_S0[(u >> 8) & 0xFF], ZUC_S1[u & 0xFF]); \
+    ZUC_R2 = MAKEU32(ZUC_S0[v >> 24], ZUC_S1[(v >> 16) & 0xFF], ZUC_S0[(v >> 8) & 0xFF], ZUC_S1[v & 0xFF]);
 
 void zuc_init(const uint8_t *key, const uint8_t *iv)
 {
@@ -97,11 +97,11 @@ void zuc_init(const uint8_t *key, const uint8_t *iv)
     uint32_t X0, X1, X2, X3;
     for (i = 0; i < 16; i++)
     {
-        LFSR[i] = MAKEU31(key[i], ZUC_KD[i], iv[i]);
+        ZUC_LFSR[i] = MAKEU31(key[i], ZUC_KD[i], iv[i]);
     }
-    /* R1 R2的初始化 */
-    R1 = 0;
-    R2 = 0;
+    /* ZUC_R1 R2的初始化 */
+    ZUC_R1 = 0;
+    ZUC_R2 = 0;
     for (i = 0; i < 32; i++)
     {
         BitReconstruction(X0, X1, X2, X3);
@@ -117,7 +117,7 @@ uint32_t zuc_generate_keyword()
     uint32_t Z;
 
     BitReconstruction(X0, X1, X2, X3);
-    Z = X3 ^ F(X0, X1, X2);
+    Z = X3 ^ F(X0, X1, X2)
     LFSRWithWorkMode();
 
     return Z;
@@ -126,7 +126,7 @@ uint32_t zuc_generate_keyword()
 void zuc_generate_keystream(size_t nwords, uint32_t *keystream)
 {
     uint32_t X0, X1, X2, X3;
-    uint32_t W, W1, W2, u, v;
+    uint32_t W1, W2, u, v;
     size_t i;
 
     BitReconstruction(X0, X1, X2, X3);
@@ -151,7 +151,7 @@ void zuc_encrypt(const uint8_t *input, size_t inlen, const uint8_t *key, const u
     zuc_init(key, iv);
     size_t nwords;
     uint32_t t, n = 0;
-    uint8_t *pinput = input;
+    uint8_t *pinput = (uint8_t *) input;
     if (inlen % 4 == 0)
     {
         nwords = inlen / 4;
@@ -201,7 +201,7 @@ void zuc_decrypt(const uint8_t *input, size_t inlen, const uint8_t *key, const u
     zuc_init(key, iv);
     size_t nwords;
     uint32_t t, n = 0;
-    uint8_t *pinput = input;
+    uint8_t *pinput = (uint8_t *) input;
     if (inlen % 4 == 0)
     {
         nwords = inlen / 4;

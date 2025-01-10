@@ -63,6 +63,8 @@
     #define GET_SYM_BITS(cipher_algo) ((cipher_algo) & 0x0F)
     #define SYM_SM4             0x01    /* 00000001b */
     #define SYM_AES             0x02    /* 00000010b */
+    #define SYM_RC4             0x03    /* 00000011b */
+    #define SYM_ZUC             0x04    /* 00000100b */
 
     typedef void (*CBC_ENC)(const uint8_t *input, void* subKeys, uint8_t *output);
     typedef void (*CBC_DEC)(const uint8_t *input, void* subKeys, uint8_t *output);

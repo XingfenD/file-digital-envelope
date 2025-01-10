@@ -11,12 +11,12 @@ extern "C"
 
 #define ZUC_KEY_SIZE 16
 #define ZUC_IV_SIZE 16
-    /*LFSR*/
-    uint32_t LFSR[32];
+    /* ZUC_LFSR */
+    uint32_t ZUC_LFSR[32];
 
     /* R1和R2 */
-    uint32_t R1;
-    uint32_t R2;
+    uint32_t ZUC_R1;
+    uint32_t ZUC_R2;
 
     /**
      * @brief
