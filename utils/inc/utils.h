@@ -57,10 +57,10 @@
     /* function names in this module start with pkcs7_ */
     #ifdef UITILS_PKCS7_MOD
     #error "Macro UITILS_PKCS7_MOD already defined"
-    #endif/* UITILS_PKCS7_MOD */
+    #endif /* UITILS_PKCS7_MOD */
     #define UITILS_PKCS7_MOD
     #ifdef UITILS_PKCS7_MOD
-        /* NOTE: the pkcs7 block size is 16 */
+    /* NOTE: the pkcs7 block size is 16 */
 
         /**
          * @brief calculate the PKCS#7 padded length of @bytes_to_pad
@@ -89,15 +89,14 @@
          */
         void pkcs7_padding(const uint8_t *input, const size_t in_len, uint8_t *output);
 
-    #endif /* UITILS_PKCS7_MOD */
-    /* end of pkcs7 function statements */
-
+        #endif /* UITILS_PKCS7_MOD */
+        /* end of pkcs7 function statements */
 
     /* start of advanced string function statements */
     /* function names in this module start with str_ */
     #ifdef UITILS_STR_MOD
     #error "Macro UITILS_STR_MOD already defined"
-    #endif/* UITILS_STR_MOD */
+    #endif /* UITILS_STR_MOD */
     #define UITILS_STR_MOD
     #ifdef UITILS_STR_MOD
 
@@ -151,6 +150,21 @@
     #endif /* UITILS_STR_MOD */
     /* end of advanced string function statements */
 
+
+    #define ENCRYPT_MODE
+    #ifdef ENCRYPT_MODE
+        #define cbc_mode
+            enum algomode
+            {
+                AES = 1,
+                DES,
+                SM4,
+            };
+        #ifdef cbc_mode
+            void cbc_encrypt_blocks(enum algomode mode,const *key, uint8_t *iv, const uint8_t *input, size_t nblocks, uint8_t *out);
+            void cbc_decrypt_blocks(enum algomode mode, const *key, uint8_t *iv, const uint8_t *input, size_t nblocks, uint8_t *output);
+        #endif
+    #endif
     /**
      * @brief random and malloc a bytes array
      * @param[out]  byte2random     the output of random bytes
@@ -161,7 +175,7 @@
     void random_bytes(uint8_t *bytes2random, int bytes_num);
 
     /**
-      * @brief 
+      * @brief
       * @param[in]  block_enc      My Param doc
       * @param[in]  in_len         My Param doc
       * @param[out] out_len        My Param doc
@@ -174,4 +188,5 @@
 
 
     void cbc_padding_decrypt(CBC_ENC block_dec, const size_t in_len, size_t *out_len, const uint8_t *input, void* subKeys, uint8_t **output, uint8_t *vector);
+
 #endif /* !UTILS_H */

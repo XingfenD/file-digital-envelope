@@ -84,8 +84,10 @@ char *str_rep_ext(const char *origin_file_name, const char *new_ext_name) {
     if ((p_dot = strrchr(origin_file_name, '.')) == NULL) {
         /* if there are not extension in the filename */
         ret = str_malloc_cat(origin_file_name, new_ext_name);
-    } else {
-        ret = calloc((int) (p_dot - origin_file_name) + 1 + strlen(new_ext_name) + 1, sizeof(char));
+    }
+    else
+    {
+        ret = calloc((int)(p_dot - origin_file_name) + 1 + strlen(new_ext_name) + 1, sizeof(char));
         memcpy(ret, origin_file_name, (p_dot - origin_file_name) + 1);
         strcat(ret, new_ext_name);
     }
@@ -149,4 +151,118 @@ void cbc_padding_decrypt(CBC_ENC block_dec, const size_t in_len, size_t *out_len
      */
 
     *out_len = pkcs7_parsed_len(*output, in_len);
+}
+
+
+/* start of encrypt&decrypt mode function definations */
+
+void cbc_encrypt_blocks(enum algomode mode, const *key, uint8_t *iv, const uint8_t *input, size_t nblocks, uint8_t *output)
+{
+    uint32_t block_size;
+    uint8_t *pinput = input;
+    uint8_t *temp = malloc(sizeof(uint8_t) * 16);
+    switch (mode)
+    {
+    case AES:
+        /* code */
+        block_size = 16;
+        while (nblocks--)
+        {
+            for (size_t i = 0; i < block_size; i++)
+            {
+                temp[i] = pinput[i] ^ iv[i];
+            }
+            sm4_encrypt_block(temp, key, output);
+            iv = output;
+            pinput += block_size;
+            output += block_size;
+        }
+        break;
+    case DES:
+        /* code */
+        block_size = 8;
+        while (nblocks--)
+        {
+            for (size_t i = 0; i < block_size; i++)
+            {
+                temp[i] = pinput[i] ^ iv[i];
+            }
+            sm4_encrypt_block(temp, key, output);
+            iv = output;
+            pinput += block_size;
+            output += block_size;
+        }
+        break;
+    case SM4:
+        block_size = 16;
+        while (nblocks--)
+        {
+            for (size_t i = 0; i < block_size; i++)
+            {
+                temp[i] = pinput[i] ^ iv[i];
+            }
+            sm4_encrypt_block(temp, key, output);
+            iv = output;
+            pinput += block_size;
+            output += block_size;
+        }
+        break;
+    default:
+        break;
+    }
+}
+
+void cbc_decrypt_blocks(enum algomode mode, const *key, uint8_t *iv, const uint8_t *input, size_t nblocks, uint8_t *output)
+{
+    uint32_t block_size;
+    uint8_t *pinput = input;
+    switch (mode)
+    {
+    case AES:
+        /* code */
+        block_size = 16;
+        while (nblocks--)
+        {
+            sm4_encrypt_block(pinput, key, output);
+            for (size_t i = 0; i < block_size; i++)
+            {
+                output[i] = output[i] ^ iv[i];
+            }
+            iv = pinput;
+            pinput += block_size;
+            output += block_size;
+        }
+        break;
+    case DES:
+        /* code */
+        block_size = 8;
+        while (nblocks--)
+        {
+            sm4_encrypt_block(pinput, key, output);
+            for (size_t i = 0; i < block_size; i++)
+            {
+                output[i] = output[i] ^ iv[i];
+            }
+            iv = pinput;
+            pinput += block_size;
+            output += block_size;
+        }
+        break;
+    case SM4:
+        block_size = 16;
+        while (nblocks--)
+        {
+            sm4_encrypt_block(pinput, key, output);
+            for (size_t i = 0; i < block_size; i++)
+            {
+                output[i] = output[i] ^ iv[i];
+            }
+            iv = pinput;
+            pinput += block_size;
+            output += block_size;
+        }
+        break;
+    default:
+        break;
+    }
 }
