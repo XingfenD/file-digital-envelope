@@ -1,37 +1,35 @@
 #include <string.h>
-#include "bignum.h"
+#include <bignum.h>
 
 static bn_t bn_sub_digit_mul(bn_t *a, bn_t *b, bn_t c, bn_t *d, uint32_t digits);
 static bn_t bn_add_digit_mul(bn_t *a, bn_t *b, bn_t c, bn_t *d, uint32_t digits);
 static uint32_t bn_digit_bits(bn_t a);
 
-void bn_decode(bn_t *bn, uint32_t digits, uint8_t *hexarr, uint32_t size)
-{
+void bn_decode(bn_t *bn, uint32_t digits, uint8_t *hexarr, uint32_t size) {
     bn_t t;
     int j;
     uint32_t i, u;
-    for(i=0,j=size-1; i<digits && j>=0; i++) {
+    for(i = 0,j = size - 1; i < digits && j >= 0; i++) {
         t = 0;
-        for(u=0; j>=0 && u<BN_DIGIT_BITS; j--, u+=8) {
+        for(u = 0; j >= 0 && u < BN_DIGIT_BITS; j--, u+=8) {
             t |= ((bn_t)hexarr[j]) << u;
         }
         bn[i] = t;
     }
 
-    for(; i<digits; i++) {
+    for(; i < digits; i++) {
         bn[i] = 0;
     }
 }
 
-void bn_encode(uint8_t *hexarr, uint32_t size, bn_t *bn, uint32_t digits)
-{
+void bn_encode(uint8_t *hexarr, uint32_t size, bn_t *bn, uint32_t digits) {
     bn_t t;
     int j;
     uint32_t i, u;
 
-    for(i=0,j=size-1; i<digits && j>=0; i++) {
+    for(i = 0, j = size - 1; i < digits && j >= 0; i++) {
         t = bn[i];
-        for(u=0; j>=0 && u<BN_DIGIT_BITS; j--, u+=8) {
+        for(u = 0; j >= 0 && u < BN_DIGIT_BITS; j--, u += 8) {
             hexarr[j] = (uint8_t)(t >> u);
         }
     }
@@ -41,29 +39,26 @@ void bn_encode(uint8_t *hexarr, uint32_t size, bn_t *bn, uint32_t digits)
     }
 }
 
-void bn_assign(bn_t *a, bn_t *b, uint32_t digits)
-{
+void bn_assign(bn_t *a, bn_t *b, uint32_t digits) {
     uint32_t i;
-    for(i=0; i<digits; i++) {
+    for(i = 0; i < digits; i++) {
         a[i] = b[i];
     }
 }
 
-void bn_assign_zero(bn_t *a, uint32_t digits)
-{
+void bn_assign_zero(bn_t *a, uint32_t digits) {
     uint32_t i;
-    for(i=0; i<digits; i++) {
+    for(i = 0; i<digits; i++) {
         a[i] = 0;
     }
 }
 
-bn_t bn_add(bn_t *a, bn_t *b, bn_t *c, uint32_t digits)
-{
+bn_t bn_add(bn_t *a, bn_t *b, bn_t *c, uint32_t digits) {
     bn_t ai, carry;
     uint32_t i;
 
     carry = 0;
-    for(i=0; i<digits; i++) {
+    for(i = 0; i<digits; i++) {
         if((ai = b[i] + carry) < carry) {
             ai = c[i];
         } else if((ai += c[i]) < c[i]) {
@@ -77,13 +72,12 @@ bn_t bn_add(bn_t *a, bn_t *b, bn_t *c, uint32_t digits)
     return carry;
 }
 
-bn_t bn_sub(bn_t *a, bn_t *b, bn_t *c, uint32_t digits)
-{
+bn_t bn_sub(bn_t *a, bn_t *b, bn_t *c, uint32_t digits) {
     bn_t ai, borrow;
     uint32_t i;
 
     borrow = 0;
-    for(i=0; i<digits; i++) {
+    for(i = 0; i<digits; i++) {
         if((ai = b[i] - borrow) > (BN_MAX_DIGIT - borrow)) {
             ai = BN_MAX_DIGIT - c[i];
         } else if((ai -= c[i]) > (BN_MAX_DIGIT - c[i])) {
@@ -97,8 +91,7 @@ bn_t bn_sub(bn_t *a, bn_t *b, bn_t *c, uint32_t digits)
     return borrow;
 }
 
-void bn_mul(bn_t *a, bn_t *b, bn_t *c, uint32_t digits)
-{
+void bn_mul(bn_t *a, bn_t *b, bn_t *c, uint32_t digits) {
     bn_t t[2*BN_MAX_DIGITS];
     uint32_t bdigits, cdigits, i;
 
@@ -106,7 +99,7 @@ void bn_mul(bn_t *a, bn_t *b, bn_t *c, uint32_t digits)
     bdigits = bn_digits(b, digits);
     cdigits = bn_digits(c, digits);
 
-    for(i=0; i<bdigits; i++) {
+    for(i = 0; i<bdigits; i++) {
         t[i+cdigits] += bn_add_digit_mul(&t[i], &t[i], b[i], c, cdigits);
     }
 
@@ -116,8 +109,7 @@ void bn_mul(bn_t *a, bn_t *b, bn_t *c, uint32_t digits)
     memset((uint8_t *)t, 0, sizeof(t));
 }
 
-void bn_div(bn_t *a, bn_t *b, bn_t *c, uint32_t cdigits, bn_t *d, uint32_t ddigits)
-{
+void bn_div(bn_t *a, bn_t *b, bn_t *c, uint32_t cdigits, bn_t *d, uint32_t ddigits) {
     dbn_t tmp;
     bn_t ai, t, cc[2*BN_MAX_DIGITS+1], dd[BN_MAX_DIGITS];
     int i;
@@ -162,8 +154,7 @@ void bn_div(bn_t *a, bn_t *b, bn_t *c, uint32_t cdigits, bn_t *d, uint32_t ddigi
     memset((uint8_t *)dd, 0, sizeof(dd));
 }
 
-bn_t bn_shift_l(bn_t *a, bn_t *b, uint32_t c, uint32_t digits)
-{
+bn_t bn_shift_l(bn_t *a, bn_t *b, uint32_t c, uint32_t digits) {
     bn_t bi, carry;
     uint32_t i, t;
 
@@ -172,7 +163,7 @@ bn_t bn_shift_l(bn_t *a, bn_t *b, uint32_t c, uint32_t digits)
 
     t = BN_DIGIT_BITS - c;
     carry = 0;
-    for(i=0; i<digits; i++) {
+    for(i = 0; i<digits; i++) {
         bi = b[i];
         a[i] = (bi << c) | carry;
         carry = c ? (bi >> t) : 0;
@@ -181,8 +172,7 @@ bn_t bn_shift_l(bn_t *a, bn_t *b, uint32_t c, uint32_t digits)
     return carry;
 }
 
-bn_t bn_shift_r(bn_t *a, bn_t *b, uint32_t c, uint32_t digits)
-{
+bn_t bn_shift_r(bn_t *a, bn_t *b, uint32_t c, uint32_t digits) {
     bn_t bi, carry;
     int i;
     uint32_t t;
@@ -202,8 +192,7 @@ bn_t bn_shift_r(bn_t *a, bn_t *b, uint32_t c, uint32_t digits)
     return carry;
 }
 
-void bn_mod(bn_t *a, bn_t *b, uint32_t bdigits, bn_t *c, uint32_t cdigits)
-{
+void bn_mod(bn_t *a, bn_t *b, uint32_t bdigits, bn_t *c, uint32_t cdigits) {
     bn_t t[2*BN_MAX_DIGITS] = {0};
 
     bn_div(t, a, b, bdigits, c, cdigits);
@@ -212,8 +201,7 @@ void bn_mod(bn_t *a, bn_t *b, uint32_t bdigits, bn_t *c, uint32_t cdigits)
     memset((uint8_t *)t, 0, sizeof(t));
 }
 
-void bn_mod_mul(bn_t *a, bn_t *b, bn_t *c, bn_t *d, uint32_t digits)
-{
+void bn_mod_mul(bn_t *a, bn_t *b, bn_t *c, bn_t *d, uint32_t digits) {
     bn_t t[2*BN_MAX_DIGITS];
 
     bn_mul(t, b, c, digits);
@@ -223,8 +211,7 @@ void bn_mod_mul(bn_t *a, bn_t *b, bn_t *c, bn_t *d, uint32_t digits)
     memset((uint8_t *)t, 0, sizeof(t));
 }
 
-void bn_mod_exp(bn_t *a, bn_t *b, bn_t *c, uint32_t cdigits, bn_t *d, uint32_t ddigits)
-{
+void bn_mod_exp(bn_t *a, bn_t *b, bn_t *c, uint32_t cdigits, bn_t *d, uint32_t ddigits) {
     bn_t bpower[3][BN_MAX_DIGITS], ci, t[BN_MAX_DIGITS];
     int i;
     uint32_t ci_bits, j, s;
@@ -265,8 +252,7 @@ void bn_mod_exp(bn_t *a, bn_t *b, bn_t *c, uint32_t cdigits, bn_t *d, uint32_t d
     memset((uint8_t *)t, 0, sizeof(t));
 }
 
-int bn_cmp(bn_t *a, bn_t *b, uint32_t digits)
-{
+int bn_cmp(bn_t *a, bn_t *b, uint32_t digits) {
     int i;
     for(i=digits-1; i>=0; i--) {
         if(a[i] > b[i])     return 1;
@@ -276,8 +262,7 @@ int bn_cmp(bn_t *a, bn_t *b, uint32_t digits)
     return 0;
 }
 
-uint32_t bn_digits(bn_t *a, uint32_t digits)
-{
+uint32_t bn_digits(bn_t *a, uint32_t digits) {
     int i;
     for(i=digits-1; i>=0; i--) {
         if(a[i])    break;
@@ -286,8 +271,7 @@ uint32_t bn_digits(bn_t *a, uint32_t digits)
     return (i + 1);
 }
 
-static bn_t bn_add_digit_mul(bn_t *a, bn_t *b, bn_t c, bn_t *d, uint32_t digits)
-{
+static bn_t bn_add_digit_mul(bn_t *a, bn_t *b, bn_t c, bn_t *d, uint32_t digits) {
     dbn_t result;
     bn_t carry, rh, rl;
     uint32_t i;
@@ -296,7 +280,7 @@ static bn_t bn_add_digit_mul(bn_t *a, bn_t *b, bn_t c, bn_t *d, uint32_t digits)
         return 0;
 
     carry = 0;
-    for(i=0; i<digits; i++) {
+    for(i = 0; i<digits; i++) {
         result = (dbn_t)c * d[i];
         rl = result & BN_MAX_DIGIT;
         rh = (result >> BN_DIGIT_BITS) & BN_MAX_DIGIT;
@@ -314,8 +298,7 @@ static bn_t bn_add_digit_mul(bn_t *a, bn_t *b, bn_t c, bn_t *d, uint32_t digits)
     return carry;
 }
 
-static bn_t bn_sub_digit_mul(bn_t *a, bn_t *b, bn_t c, bn_t *d, uint32_t digits)
-{
+static bn_t bn_sub_digit_mul(bn_t *a, bn_t *b, bn_t c, bn_t *d, uint32_t digits) {
     dbn_t result;
     bn_t borrow, rh, rl;
     uint32_t i;
@@ -324,7 +307,7 @@ static bn_t bn_sub_digit_mul(bn_t *a, bn_t *b, bn_t c, bn_t *d, uint32_t digits)
         return 0;
 
     borrow = 0;
-    for(i=0; i<digits; i++) {
+    for(i = 0; i < digits; i++) {
         result = (dbn_t)c * d[i];
         rl = result & BN_MAX_DIGIT;
         rh = (result >> BN_DIGIT_BITS) & BN_MAX_DIGIT;
@@ -342,10 +325,9 @@ static bn_t bn_sub_digit_mul(bn_t *a, bn_t *b, bn_t c, bn_t *d, uint32_t digits)
     return borrow;
 }
 
-static uint32_t bn_digit_bits(bn_t a)
-{
+static uint32_t bn_digit_bits(bn_t a) {
     uint32_t i;
-    for(i=0; i<BN_DIGIT_BITS; i++) {
+    for(i = 0; i < BN_DIGIT_BITS; i++) {
         if(a == 0)  break;
         a >>= 1;
     }
