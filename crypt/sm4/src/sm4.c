@@ -75,7 +75,7 @@ void sm4_encrypt_block(const uint8_t *input, const uint32_t encSubKeys[SM4_ROUND
     for (int i = 0; i < 32; i++)
     {
         tmp = buff[i + 1] ^ buff[i + 2] ^ buff[i + 3] ^ encSubKeys[i];
-        buff[i + 4] = buff[i] ^ Table0[(tmp >> 24) & 0xff] ^ Table1[(tmp >> 16) & 0xff] ^ Table2[(tmp >> 8) & 0xff] ^ Table3[(tmp >> 0) & 0xff];
+        buff[i + 4] = buff[i] ^ SM4_Table0[(tmp >> 24) & 0xff] ^ SM4_Table1[(tmp >> 16) & 0xff] ^ SM4_Table2[(tmp >> 8) & 0xff] ^ SM4_Table3[(tmp >> 0) & 0xff];
     }
     for (int i = 0; i < 4; i++)
     {
@@ -97,7 +97,7 @@ void sm4_decrypt_block(const uint8_t *input, const uint32_t decSubKeys[SM4_ROUND
     for (int i = 0; i < 32; i++)
     {
         tmp = buff[i + 1] ^ buff[i + 2] ^ buff[i + 3] ^ decSubKeys[i];
-        buff[i + 4] = buff[i] ^ Table0[(tmp >> 24) & 0xff] ^ Table1[(tmp >> 16) & 0xff] ^ Table2[(tmp >> 8) & 0xff] ^ Table3[(tmp >> 0) & 0xff];
+        buff[i + 4] = buff[i] ^ SM4_Table0[(tmp >> 24) & 0xff] ^ SM4_Table1[(tmp >> 16) & 0xff] ^ SM4_Table2[(tmp >> 8) & 0xff] ^ SM4_Table3[(tmp >> 0) & 0xff];
     }
     for (int i = 0; i < 4; i++)
     {
