@@ -151,7 +151,7 @@
     /* end of advanced string function statements */
 
 
-    #define ENCRYPT_MODE
+    // #define ENCRYPT_MODE
     #ifdef ENCRYPT_MODE
         #define cbc_mode
             enum algomode

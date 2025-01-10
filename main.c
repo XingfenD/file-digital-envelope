@@ -156,6 +156,7 @@ int main(int argc, char *argv[]) {
         uint8_t *plain_text = NULL, *cipher_text = NULL;
         uint8_t *asy_info = NULL, *sym_info = NULL;
         uint8_t *sym_key = NULL, *pub_key = NULL;
+        uint8_t *cipher_sym_key = NULL;
         size_t plain_text_len, cipher_text_len, pub_key_len;
         FILE *outfile = NULL;
         FDE_HEAD fde_head = {};
@@ -165,7 +166,7 @@ int main(int argc, char *argv[]) {
          * [*] file_type
          * [*] origin_ext
          * [*] cipher_algo
-         * [ ] asy_info_len
+         * [*] asy_info_len
          * [ ] sym_info_len
          * [ ] sym_key_len - will be assigned in symmtric switch block
          */
@@ -181,6 +182,7 @@ int main(int argc, char *argv[]) {
             memcpy(fde_head.origin_ext, pdot + 1, strlen(pdot) + 1);
             // strcpy((char *) fde_head.origin_ext, pdot + 1);
         }
+        fde_head.asy_info_len = 0;
 
         /* init default arg */
         if (outfile_path == NULL) {
@@ -205,7 +207,24 @@ int main(int argc, char *argv[]) {
             sym_key = malloc(fde_head.sym_key_len * sizeof(uint8_t));
             random_bytes(sym_info, fde_head.sym_info_len);
             random_bytes(sym_key, fde_head.sym_key_len);
-            sm4_padding_encrypt(plain_text, &cipher_text, plain_text_len, &cipher_text_len, sym_info, sym_key);
+            sm4_padding_encrypt(
+                plain_text, &cipher_text,
+                plain_text_len, &cipher_text_len,
+                sym_info, sym_key
+            );
+            break;
+        case SYM_AES:
+            fde_head.sym_key_len = 16;
+            fde_head.sym_info_len = 16;
+            sym_info = malloc(fde_head.sym_info_len * sizeof(uint8_t));
+            sym_key = malloc(fde_head.sym_key_len * sizeof(uint8_t));
+            random_bytes(sym_info, fde_head.sym_info_len);
+            random_bytes(sym_key, fde_head.sym_key_len);
+            aes_padding_encrypt(
+                plain_text, &cipher_text,
+                plain_text_len, &cipher_text_len,
+                sym_info, sym_key
+            );
             break;
         default:
             break;
@@ -214,17 +233,29 @@ int main(int argc, char *argv[]) {
         switch (GET_ASY_BITS(cipher_algo))
         {
         case ASY_RSA:
-            break;
-        default:
+            cipher_sym_key = malloc(fde_head.sym_key_len * sizeof(uint8_t));
+            rsa_encrypt(sym_key, cipher_sym_key, fde_head.sym_key_len, NULL, pub_key, pub_key_len);
             break;
         }
 
+
+        outfile = fopen(outfile_path, "wb");
+        fwrite(&fde_head, 1, sizeof(fde_head), outfile);
+        fwrite(cipher_sym_key, 1, fde_head.sym_key_len, outfile);
+        fwrite(asy_info, 1, fde_head.asy_info_len, outfile);
+        fwrite(sym_info, 1, fde_head.sym_info_len, outfile);
+        fwrite(cipher_text, 1, cipher_text_len, outfile);
+
+        fclose(outfile);
+
+        free(cipher_sym_key);
         free(sym_key); /* malloced in symmetric encryption */
         free(sym_info); /* malloced in symmetric encryption */
         free(asy_info); /* malloced in asymmetric encryption */
+        free(cipher_text); /* malloced in padding encrypt */
         free(plain_text); /* malloced in read_bin_file */
         free(pub_key);  /* malloced in read_bin_file */
-    } else if (mode == DEC_MODE){ /* if (mode == ENC_MODE) */
+    } else if (mode == DEC_MODE) { /* if (mode == ENC_MODE) */
         char ext_name[17];
 
         ParseRst parse_rst = {}; /* the return value of function:./utils/main_callee::parse_fde_file() */
@@ -253,8 +284,7 @@ int main(int argc, char *argv[]) {
             );
             // sym_key_len = parse_rst.crypted_key_len;
             break;
-        default:
-            break;
+
         }
 
         /* decrypt the key using symmetric encrypt algorithm */
@@ -267,8 +297,12 @@ int main(int argc, char *argv[]) {
                 parse_rst.sym_info, sym_key
             );
             break;
-
-        default:
+        case SYM_AES:
+            aes_padding_decrypt(
+                parse_rst.crypted_text, decrypt_text,
+                parse_rst.crypted_text_len, &decrypt_text_len,
+                parse_rst.sym_info, sym_key
+            );
             break;
         }
 

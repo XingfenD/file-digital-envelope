@@ -46,7 +46,7 @@
         uint8_t  coefficient[128];       /* CRT coefficient */
     } rsa_pkey;
 
-    // void read_key_file(const char *key_path, uint8_t **key, size_t *key_len);
+    void read_key_file(const char *key_path, uint8_t **key, size_t *key_len);
     void rsa_encrypt(uint8_t *input, uint8_t *output, size_t in_len, size_t *out_len, uint8_t *key, size_t key_len);
     void rsa_decrypt(uint8_t *input, uint8_t *output, size_t in_len, size_t *out_len, uint8_t *key, size_t key_len);
 

@@ -53,6 +53,8 @@ extern "C"
      */
     void aes_decrypt_block(const uint8_t *input, uint8_t subKeys[11][16], uint8_t *output);
 
+    void aes_padding_encrypt(const uint8_t *input, uint8_t **output, size_t in_len, size_t *out_len, const uint8_t vector[16], const uint8_t key[16]);
+    void aes_padding_decrypt(const uint8_t *input, uint8_t *output, size_t in_len, size_t *out_len, const uint8_t vector[16], const uint8_t key[16]);
 #ifdef __cplusplus
 }
 #endif

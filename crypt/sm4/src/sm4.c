@@ -151,16 +151,9 @@ void sm4_padding_encrypt(
     size_t in_len, size_t *out_len,
     const uint8_t vector[16], const uint8_t key[16]
 ) {
-    /* init the variables and malloc memory */
-    *out_len = pkcs7_padded_len(in_len);
-
-    uint8_t *padded_input = malloc(sizeof(uint8_t) * *out_len);
-    *output = malloc(sizeof(uint8_t) * *out_len);
-    /* pad the input bytes */
-    pkcs7_padding(input, in_len, padded_input);
-    enum algomode mode = SM4;
-    cbc_encrypt_blocks(mode, key, vector, padded_input, (*out_len) / 16, output);
-    free(padded_input);
+    uint8_t enc_subkeys[32];
+    sm4_make_enc_subkeys(key, enc_subkeys);
+    cbc_padding_encrypt(&sm4_encrypt_block, in_len, out_len, input, enc_subkeys, output, vector);
 }
 
 /**
@@ -177,7 +170,7 @@ void sm4_padding_decrypt(
     size_t in_len, size_t *out_len,
     const uint8_t vector[16], const uint8_t key[16]
 ) {
-    enum algomode mode = SM4;
-    cbc_decrypt_blocks(mode, key, vector, input, in_len / 16, output);
-    *out_len = pkcs7_parsed_len(output, in_len);
+    uint8_t dec_subkeys[32];
+    sm4_make_dec_subkeys(key, dec_subkeys);
+    cbc_padding_decrypt(&sm4_decrypt_block, in_len, out_len, input, dec_subkeys, output, vector);
 }
