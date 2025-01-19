@@ -20,7 +20,7 @@ void utils_print() {
     // TODO: this function should be removed in the final version of this project
     debug_print("this is function ./utils/src/utils.c:utils_print()\n");
 }
-// NOTE:
+
 /* start of pkcs7 function definations */
 
 size_t pkcs7_padded_len(size_t in_len) {
@@ -112,7 +112,6 @@ void cbc_padding_encrypt(CBC_ENC block_enc, const size_t in_len, size_t *out_len
     /* pad the input bytes */
     pkcs7_padding(input, in_len, padded_input);
 
-    /* TODO: execute sm4_cbc_encrypt process below */
     /**
      * related varibles
      * @param[in]   padded_input        the bytes to encrypt in cbc mode
@@ -124,22 +123,22 @@ void cbc_padding_encrypt(CBC_ENC block_enc, const size_t in_len, size_t *out_len
     memcpy(xor_arg, vector, 16);
     size_t block_num = *out_len / 16;
     for (size_t i = 0; i < block_num; i++) {
-        // fread(encblock, sizeof(unsigned char), 16, bin_input_file);
-        memcpy(encblock, padded_input + block_num * 16, 16);
+        // fread(encblock, sizeof(uint8_t), 16, bin_input_file);
+        memcpy(encblock, padded_input + i * 16, 16);
         ((uint32_t *) encblock)[0] ^= ((uint32_t *) xor_arg)[0];
         ((uint32_t *) encblock)[1] ^= ((uint32_t *) xor_arg)[1];
         ((uint32_t *) encblock)[2] ^= ((uint32_t *) xor_arg)[2];
         ((uint32_t *) encblock)[3] ^= ((uint32_t *) xor_arg)[3];
-        block_enc(encblock, subKeys, xor_arg);
-        // fwrite(xor_arg, sizeof(unsigned char), 16, bin_output_file);
+        (*block_enc) (encblock, subKeys, xor_arg);
+        // fwrite(xor_arg, sizeof(uint8_t), 16, bin_output_file);
         memcpy(*output + 16 * i, xor_arg, 16);
     }
 
     free(padded_input);
 }
 
-void cbc_padding_decrypt(CBC_ENC block_dec, const size_t in_len, size_t *out_len, const uint8_t *input, void* subKeys, uint8_t **output, uint8_t *vector) {
-    /* TODO: execute sm4_cbc_decrypt process below */
+void cbc_padding_decrypt(CBC_ENC block_dec, const size_t in_len, size_t *out_len, const uint8_t *input, void* subKeys, uint8_t *output, uint8_t *vector) {
+    /* TODO: rename the varibles in decrypt to be similar to the ones used in encrypt */
     /**
      * related varibles
      * @param[in]   input               the bytes to decrypt in cbc mode
@@ -147,6 +146,28 @@ void cbc_padding_decrypt(CBC_ENC block_dec, const size_t in_len, size_t *out_len
      * @param[in]   in_len              both the length of @input and @output
      * @param[in]   vector              the origin xor arg vector (iv)
      */
+    uint8_t xor_arg[16];
+    uint8_t *block2dec = NULL;
+    uint8_t *block2write = NULL;
 
-    *out_len = pkcs7_parsed_len(*output, in_len);
+
+    size_t block_num  = in_len / 16;
+    block2dec = input;
+    block2write = output;
+    memcpy(xor_arg, vector, 16);
+
+    for (size_t i = 0; i < block_num; i++) {
+        (*block_dec) (block2dec, subKeys, block2write);
+
+        ((uint32_t *) block2write)[0] ^= ((uint32_t *) xor_arg)[0];
+        ((uint32_t *) block2write)[1] ^= ((uint32_t *) xor_arg)[1];
+        ((uint32_t *) block2write)[2] ^= ((uint32_t *) xor_arg)[2];
+        ((uint32_t *) block2write)[3] ^= ((uint32_t *) xor_arg)[3];
+
+        memcpy(xor_arg, block2dec, 16);
+        block2dec += 16;
+        block2write += 16;
+    }
+
+    *out_len = pkcs7_parsed_len(output, in_len);
 }

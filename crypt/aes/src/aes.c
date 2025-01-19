@@ -21,7 +21,15 @@ void aes_print() {
     printf("this is function ./crypt/aes/src/aes.c:aes_print()\n");
 }
 
-int aes_make_enc_subkeys(const uint8_t key[16], uint8_t subKeys[11][16]) {
+
+/**
+ * @brief Generate encryption subkeys
+ * @param[in] key original key
+ * @param[out] subKeys generated encryption subkeys
+ * @return 0 OK
+ * @return 1 Failed
+ */
+static int aes_make_enc_subkeys(const uint8_t key[16], uint8_t subKeys[11][16]) {
     memcpy(subKeys[0], key, 16);
 
     for (int i = 1; i < 11; i++) {
@@ -46,7 +54,14 @@ int aes_make_enc_subkeys(const uint8_t key[16], uint8_t subKeys[11][16]) {
     return 0;
 }
 
-int aes_make_dec_subkeys(const uint8_t key[16], uint8_t subKeys[11][16]) {
+/**
+ * @brief Generate decryption subkeys
+ * @param[in] key original key
+ * @param[out] subKeys generated decryption subkeys
+ * @return 0 OK
+ * @return 1 Failed
+ */
+static int aes_make_dec_subkeys(const uint8_t key[16], uint8_t subKeys[11][16]) {
     aes_make_enc_subkeys(key, subKeys);
 
     /**
@@ -60,7 +75,13 @@ int aes_make_dec_subkeys(const uint8_t key[16], uint8_t subKeys[11][16]) {
     return 0;
 }
 
-void aes_encrypt_block(const uint8_t *input, uint8_t subKeys[11][16], uint8_t *output) {
+/**
+ * @brief AES encrypt single block
+ * @param[in] input plaintext, [length = AES_BLOCK_SIZE]
+ * @param[in] subKeys subKeys
+ * @param[out] output ciphertext, [length = AES_BLOCK_SIZE]
+ */
+static void aes_encrypt_block(const uint8_t *input, uint8_t subKeys[11][16], uint8_t *output) {
     // initialize the output
     memcpy(output, input, 16);
     aes_add_round_key(output, subKeys[0]);
@@ -77,7 +98,13 @@ void aes_encrypt_block(const uint8_t *input, uint8_t subKeys[11][16], uint8_t *o
     aes_add_round_key(output, subKeys[10]);
 }
 
-void aes_decrypt_block(const uint8_t *input, uint8_t subKeys[11][16], uint8_t *output) {
+/**
+ * @brief AES decrypt single block
+ * @param[in] input ciphertext, [length = AES_BLOCK_SIZE]
+ * @param[in] subKeys subKeys
+ * @param[out] output plaintext, [length = AES_BLOCK_SIZE]
+ */
+static void aes_decrypt_block(const uint8_t *input, uint8_t subKeys[11][16], uint8_t *output) {
     memcpy(output, input, 16);
     aes_add_round_key(output, subKeys[10]);
     for (int i = 9; i >= 1; i--) {
@@ -96,24 +123,9 @@ void aes_padding_encrypt(
     size_t in_len, size_t *out_len,
     const uint8_t vector[16], const uint8_t key[16]
 ) {
-    /* init the variables and malloc memory */
-    *out_len = pkcs7_padded_len(in_len);
-    uint8_t *padded_input = malloc(sizeof(uint8_t) * *out_len);
-    *output = malloc(sizeof(uint8_t) * *out_len);
-
-    /* pad the input bytes */
-    pkcs7_padding(input, in_len, padded_input);
-
-    /* TODO: execute sm4_cbc_encrypt process below */
-    /**
-     * related varibles
-     * @param[in]   padded_input        the bytes to encrypt in cbc mode
-     * @param[out]  *output             the encrypt result of cbc
-     * @param[in]   *out_len            both the length of @padded_input and @*output
-     * @param[in]   vector              the origin xor arg vector (iv)
-     */
-
-    free(padded_input);
+    uint8_t enc_subkeys[11][16];
+    aes_make_enc_subkeys(key, enc_subkeys);
+    cbc_padding_encrypt(&aes_encrypt_block, in_len, out_len, input, enc_subkeys, output, vector);
 }
 
 void aes_padding_decrypt(
@@ -121,14 +133,7 @@ void aes_padding_decrypt(
     size_t in_len, size_t *out_len,
     const uint8_t vector[16], const uint8_t key[16]
 ) {
-    /* TODO: execute sm4_cbc_decrypt process below */
-    /**
-     * related varibles
-     * @param[in]   input               the bytes to decrypt in cbc mode
-     * @param[out]  output              the decrypt result of cbc
-     * @param[in]   in_len              both the length of @input and @output
-     * @param[in]   vector              the origin xor arg vector (iv)
-     */
-
-    *out_len = pkcs7_parsed_len(output, in_len);
+    uint8_t dec_subkeys[11][16];
+    aes_make_dec_subkeys(key, dec_subkeys);
+    cbc_padding_decrypt(&aes_decrypt_block, in_len, out_len, input, dec_subkeys, output, vector);
 }

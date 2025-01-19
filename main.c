@@ -40,7 +40,7 @@ int main(int argc, char *argv[]) {
 
     /* TODO: realize an advanced args parsing with dependency and exclusion */
     /* parse the command line input */
-    while ((opt = getopt(argc, argv, "f:o:k:m:h:a:s")) != -1) {
+    while ((opt = getopt(argc, argv, "f:o:k:m:a:s:h")) != -1) {
         switch (opt) {
             case 'f':
                 if (infile_path == NULL) {
@@ -106,7 +106,7 @@ int main(int argc, char *argv[]) {
                 break;
             case 's':
                 for (uint8_t i = 0; i < G_SYM_NAMES_LEN; i++) {
-                    if (strcmp(optarg, G_ASY_NAMES[i]) == 0) {
+                    if (strcmp(optarg, G_SYM_NAMES[i]) == 0) {
                         cipher_algo |= GET_SYM_BITS(i + 1);
                     }
                 }
@@ -167,7 +167,9 @@ int main(int argc, char *argv[]) {
         uint8_t *plain_text = NULL, *cipher_text = NULL;
         uint8_t *asy_info = NULL, *sym_info = NULL;
         uint8_t *sym_key = NULL, *pub_key = NULL;
+        uint8_t *cipher_sym_key = NULL;
         size_t plain_text_len, cipher_text_len, pub_key_len;
+        size_t cipher_sym_key_len;
         FILE *outfile = NULL;
         FDE_HEAD fde_head = {};
 
@@ -176,7 +178,7 @@ int main(int argc, char *argv[]) {
          * [*] file_type
          * [*] origin_ext
          * [*] cipher_algo
-         * [ ] asy_info_len
+         * [*] asy_info_len
          * [ ] sym_info_len
          * [ ] sym_key_len - will be assigned in symmtric switch block
          */
@@ -192,6 +194,7 @@ int main(int argc, char *argv[]) {
             memcpy(fde_head.origin_ext, pdot + 1, strlen(pdot) + 1);
             // strcpy((char *) fde_head.origin_ext, pdot + 1);
         }
+        fde_head.asy_info_len = 0;
 
         /* init default arg */
         if (outfile_path == NULL) {
@@ -210,15 +213,32 @@ int main(int argc, char *argv[]) {
         switch (GET_SYM_BITS(cipher_algo))
         {
         case SYM_SM4:
-            fde_head.sym_key_len = 16;
+            // fde_head.sym_key_len = 16;
             fde_head.sym_info_len = 16;
             sym_info = malloc(fde_head.sym_info_len * sizeof(uint8_t));
-            sym_key = malloc(fde_head.sym_key_len * sizeof(uint8_t));
+            /* TODO(MAY): rename the varible names in fde_head */
+            sym_key = malloc(/* fde_head.sym_key_len */ 16 * sizeof(uint8_t));
             random_bytes(sym_info, fde_head.sym_info_len);
-            random_bytes(sym_key, fde_head.sym_key_len);
-            sm4_padding_encrypt(plain_text, &cipher_text, plain_text_len, &cipher_text_len, sym_info, sym_key);
+            random_bytes(sym_key, 16);
+
+            sm4_padding_encrypt(
+                plain_text, &cipher_text,
+                plain_text_len, &cipher_text_len,
+                sym_info, sym_key
+            );
             break;
-        default:
+        case SYM_AES:
+            fde_head.sym_info_len = 16;
+            sym_info = malloc(fde_head.sym_info_len * sizeof(uint8_t));
+            sym_key = malloc(16 * sizeof(uint8_t));
+            random_bytes(sym_info, fde_head.sym_info_len);
+            random_bytes(sym_key, 16);
+
+            aes_padding_encrypt(
+                plain_text, &cipher_text,
+                plain_text_len, &cipher_text_len,
+                sym_info, sym_key
+            );
             break;
         }
 
@@ -233,9 +253,10 @@ int main(int argc, char *argv[]) {
         free(sym_key); /* malloced in symmetric encryption */
         free(sym_info); /* malloced in symmetric encryption */
         free(asy_info); /* malloced in asymmetric encryption */
+        free(cipher_text); /* malloced in padding encrypt */
         free(plain_text); /* malloced in read_bin_file */
         free(pub_key);  /* malloced in read_bin_file */
-    } else if (mode == DEC_MODE){ /* if (mode == ENC_MODE) */
+    } else if (mode == DEC_MODE) { /* if (mode == ENC_MODE) */
         char ext_name[17];
 
         ParseRst parse_rst = {}; /* the return value of function:./utils/main_callee::parse_fde_file() */
@@ -278,8 +299,12 @@ int main(int argc, char *argv[]) {
                 parse_rst.sym_info, sym_key
             );
             break;
-
-        default:
+        case SYM_AES:
+            aes_padding_decrypt(
+                parse_rst.crypted_text, decrypt_text,
+                parse_rst.crypted_text_len, &decrypt_text_len,
+                parse_rst.sym_info, sym_key
+            );
             break;
         }
 

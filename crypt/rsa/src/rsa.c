@@ -1,7 +1,7 @@
 /**
  * @file ./crypt/rsa/src/rsa.c
  * @brief realize the function stated in file:./crypt/rsa/inc/rsa.h
- * @author
+ * @author Fendy (xingfen.star@gmail.com)
  * @version 1.0
  * @date 2024-12-10
  *

@@ -57,7 +57,7 @@
     /* function names in this module start with pkcs7_ */
     #ifdef UITILS_PKCS7_MOD
     #error "Macro UITILS_PKCS7_MOD already defined"
-    #endif/* UITILS_PKCS7_MOD */
+    #endif /* UITILS_PKCS7_MOD */
     #define UITILS_PKCS7_MOD
     #ifdef UITILS_PKCS7_MOD
         /* NOTE: the pkcs7 block size is 16 */

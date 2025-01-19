@@ -1,7 +1,7 @@
 /**
  * @file ./crypt/rsa/inc/rsa.h
  * @brief state the top functions of rsa
- * @author
+ * @author Fendy (xingfen.star@gmail.com)
  * @version 1.0
  * @date 2024-12-10
  *
