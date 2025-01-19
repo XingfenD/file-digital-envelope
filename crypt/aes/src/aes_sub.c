@@ -16,29 +16,29 @@
 
 
 
-static void s_map(unsigned char * src_bytes, const unsigned char s_table[16][16], int len) {
+static void s_map(uint8_t * src_bytes, const uint8_t s_table[16][16], int len) {
     for (int i = 0; i < len; i++) {
         src_bytes[i] = s_table[src_bytes[i] >> 4][src_bytes[i] & 0x0F];
     }
 }
 
-void aes_encrypt_word_s_map(unsigned char src_bytes[4]) {
+void aes_encrypt_word_s_map(uint8_t src_bytes[4]) {
     s_map(src_bytes, AES_S_Box1, 4);
 }
 
-void aes_decrypt_word_s_map(unsigned char src_bytes[4]) {
+void aes_decrypt_word_s_map(uint8_t src_bytes[4]) {
     s_map(src_bytes, AES_S_Box2, 4);
 }
 
-void aes_encrypt_s_map(unsigned char src_bytes[16]) {
+void aes_encrypt_s_map(uint8_t src_bytes[16]) {
     s_map(src_bytes, AES_S_Box1, 16);
 }
 
-void aes_decrypt_s_map(unsigned char src_bytes[16]) {
+void aes_decrypt_s_map(uint8_t src_bytes[16]) {
     s_map(src_bytes, AES_S_Box2, 16);
 }
 
-void aes_lef_shift_rows(unsigned char src_bytes[16]) {
+void aes_lef_shift_rows(uint8_t src_bytes[16]) {
     /**
      * array layout in a block(numbers refer to the index in the array):
      *
@@ -55,7 +55,7 @@ void aes_lef_shift_rows(unsigned char src_bytes[16]) {
      * 0x15, 0x03, 0x07, 0x11
      */
 
-    unsigned char temp[2];
+    uint8_t temp[2];
 
     // row 0
     // nothing to do
@@ -83,7 +83,7 @@ void aes_lef_shift_rows(unsigned char src_bytes[16]) {
     src_bytes[3] = temp[0];
 }
 
-void aes_rig_shift_rows(unsigned char src_bytes[16]) {
+void aes_rig_shift_rows(uint8_t src_bytes[16]) {
     /**
      * array layout in a block(numbers refer to the index in the array):
      *
@@ -100,7 +100,7 @@ void aes_rig_shift_rows(unsigned char src_bytes[16]) {
      * 0x07, 0x11, 0x15, 0x03
      */
 
-    unsigned char temp[2];
+    uint8_t temp[2];
 
     // row 0
     // nothing to do
@@ -128,8 +128,8 @@ void aes_rig_shift_rows(unsigned char src_bytes[16]) {
     src_bytes[15] = temp[0];
 }
 
-void aes_encrypt_col_confuse(unsigned char src_bytes[16]) {
-    unsigned char tmp[16];
+void aes_encrypt_col_confuse(uint8_t src_bytes[16]) {
+    uint8_t tmp[16];
 
     for (int i = 0; i < 4; i++) {
         for (int j = 0; j < 4; j++) {
@@ -144,8 +144,8 @@ void aes_encrypt_col_confuse(unsigned char src_bytes[16]) {
     memcpy(src_bytes, tmp, 16);
 }
 
-void aes_decrypt_col_confuse(unsigned char src_bytes[16]) {
-    unsigned char tmp[16];
+void aes_decrypt_col_confuse(uint8_t src_bytes[16]) {
+    uint8_t tmp[16];
 
     for (int i = 0; i < 4; i++) {
         for (int j = 0; j < 4; j++) {
@@ -160,7 +160,7 @@ void aes_decrypt_col_confuse(unsigned char src_bytes[16]) {
     memcpy(src_bytes, tmp, 16);
 }
 
-void aes_add_round_key(unsigned char src_bytes[16], unsigned char round_key[16]) {
+void aes_add_round_key(uint8_t src_bytes[16], uint8_t round_key[16]) {
     *((uint32_t *) &src_bytes[0]) =
         *((uint32_t *) &src_bytes[0]) ^
         *((uint32_t *) &round_key[0]);

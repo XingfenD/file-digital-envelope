@@ -15,6 +15,7 @@
     #include <stdint.h>
     #include <stddef.h>
     #include <malloc.h>
+    #include <defs.h>
 
     /**
      * @brief the function to show the module:utils is included and compiled correctly
@@ -159,4 +160,18 @@
      */
     void random_bytes(uint8_t *bytes2random, int bytes_num);
 
+    /**
+      * @brief 
+      * @param[in]  block_enc      My Param doc
+      * @param[in]  in_len         My Param doc
+      * @param[out] out_len        My Param doc
+      * @param[in]  input          My Param doc
+      * @param[in]  subKeys        My Param doc
+      * @param[out] output         My Param doc
+      * @param[in]  vector         My Param doc
+      */
+    void cbc_padding_encrypt(CBC_ENC block_enc, const size_t in_len, size_t *out_len, const uint8_t *input, void* subKeys, uint8_t **output, uint8_t *vector);
+
+
+    void cbc_padding_decrypt(CBC_ENC block_dec, const size_t in_len, size_t *out_len, const uint8_t *input, void* subKeys, uint8_t **output, uint8_t *vector);
 #endif /* !UTILS_H */

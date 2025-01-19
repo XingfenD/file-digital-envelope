@@ -1,6 +1,8 @@
 #ifndef AES_H
 #define AES_H
 
+#include <stdint.h>
+
 #ifdef __cplusplus
 extern "C"
 {
@@ -24,7 +26,7 @@ extern "C"
      * @return 0 OK
      * @return 1 Failed
      */
-    int aes_make_enc_subkeys(const unsigned char key[16], unsigned char subKeys[11][16]);
+    int aes_make_enc_subkeys(const uint8_t key[16], uint8_t subKeys[11][16]);
 
     /**
      * @brief Generate decryption subkeys
@@ -33,7 +35,7 @@ extern "C"
      * @return 0 OK
      * @return 1 Failed
      */
-    int aes_make_dec_subkeys(const unsigned char key[16], unsigned char subKeys[11][16]);
+    int aes_make_dec_subkeys(const uint8_t key[16], uint8_t subKeys[11][16]);
 
     /**
      * @brief AES encrypt single block
@@ -41,7 +43,7 @@ extern "C"
      * @param[in] subKeys subKeys
      * @param[out] output ciphertext, [length = AES_BLOCK_SIZE]
      */
-    void aes_encrypt_block(const unsigned char *input, unsigned char subKeys[11][16], unsigned char *output);
+    void aes_encrypt_block(const uint8_t *input, uint8_t subKeys[11][16], uint8_t *output);
 
     /**
      * @brief AES decrypt single block
@@ -49,7 +51,7 @@ extern "C"
      * @param[in] subKeys subKeys
      * @param[out] output plaintext, [length = AES_BLOCK_SIZE]
      */
-    void aes_decrypt_block(const unsigned char *input, unsigned char subKeys[11][16], unsigned char *output);
+    void aes_decrypt_block(const uint8_t *input, uint8_t subKeys[11][16], uint8_t *output);
 
 #ifdef __cplusplus
 }

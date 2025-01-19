@@ -19,6 +19,17 @@
 #include <time.h>
 #include <stdlib.h>
 
+static const char *G_SYM_NAMES[] = {
+    "sm4",
+};
+
+static const char *G_ASY_NAMES[] = {
+    "rsa"
+};
+
+static const int G_SYM_NAMES_LEN = sizeof(G_SYM_NAMES) / sizeof(char*);
+static const int G_ASY_NAMES_LEN = sizeof(G_ASY_NAMES) / sizeof(char*);
+
 /* TODO: reconstruct the main function */
 int main(int argc, char *argv[]) {
     int opt;
@@ -87,14 +98,14 @@ int main(int argc, char *argv[]) {
                 EXIT_MAIN(NORMAL_EXIT)
                 break;
             case 'a':
-                for (uint8_t i = 0; i < sizeof(G_ASY_NAMES) / sizeof(char*); i++) {
+                for (uint8_t i = 0; i < G_ASY_NAMES_LEN; i++) {
                     if (strcmp(optarg, G_ASY_NAMES[i]) == 0) {
                         cipher_algo |= GET_ASY_BITS((i + 1) << 4);
                     }
                 }
                 break;
             case 's':
-                for (uint8_t i = 0; i < sizeof(G_SYM_NAMES) / sizeof(char*); i++) {
+                for (uint8_t i = 0; i < G_SYM_NAMES_LEN; i++) {
                     if (strcmp(optarg, G_ASY_NAMES[i]) == 0) {
                         cipher_algo |= GET_SYM_BITS(i + 1);
                     }
@@ -282,7 +293,7 @@ int main(int argc, char *argv[]) {
 
         FILE *outfile = fopen(outfile_path, "wb");
         fwrite(decrypt_text, sizeof(uint8_t), decrypt_text_len, outfile);
-        free(outfile);
+        fclose(outfile);
 
         free(decrypt_text); /* malloced in main after parse_fde_file() */
         free(sym_key); /* malloced in after parse_fde_file() */

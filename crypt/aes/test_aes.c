@@ -2,8 +2,9 @@
 #include <stddef.h>
 #include <string.h>
 #include <stdio.h>
+
 // Print bytes in hexadecimal format
-void print_bytes(const unsigned char *data, size_t size)
+void print_bytes(const uint8_t *data, size_t size)
 {
     for (size_t i = 0; i < size; i++)
     {
@@ -16,22 +17,22 @@ void print_bytes(const unsigned char *data, size_t size)
 // Correctness test function
 void test_aes_correctness()
 {
-    // Fixed example key  0x00012001710198aeda79171460153594  
-    unsigned char key[AES_KEY_SIZE] = {0x00, 0x01, 0x20, 0x01, 0x71, 0x01, 0x98, 0xae, 
+    // Fixed example key  0x00012001710198aeda79171460153594
+    uint8_t key[AES_KEY_SIZE] = {0x00, 0x01, 0x20, 0x01, 0x71, 0x01, 0x98, 0xae,
     0xda, 0x79, 0x17, 0x14, 0x60, 0x15, 0x35, 0x94};
-    // Fixed example plaintext 0x0001000101a198afda78173486153566 
-    unsigned char plaintext[AES_BLOCK_SIZE] = {0x00, 0x01, 0x00, 0x01, 0x01, 0xa1, 0x98, 0xaf,
+    // Fixed example plaintext 0x0001000101a198afda78173486153566
+    uint8_t plaintext[AES_BLOCK_SIZE] = {0x00, 0x01, 0x00, 0x01, 0x01, 0xa1, 0x98, 0xaf,
     0xda, 0x78, 0x17, 0x34, 0x86, 0x15, 0x35, 0x66};
 
     // Corresponding ciphertext 0x6cdd596b8f5642cbd23b47981a65422a
-    unsigned char correctResult[AES_BLOCK_SIZE] = {0x6c, 0xdd, 0x59, 0x6b, 0x8f, 0x56, 0x42, 0xcb,
+    uint8_t correctResult[AES_BLOCK_SIZE] = {0x6c, 0xdd, 0x59, 0x6b, 0x8f, 0x56, 0x42, 0xcb,
     0xd2, 0x3b, 0x47, 0x98, 0x1a, 0x65, 0x42, 0x2a};
 
-    unsigned char ciphertext[AES_BLOCK_SIZE];
-    unsigned char decrypted[AES_BLOCK_SIZE];
+    uint8_t ciphertext[AES_BLOCK_SIZE];
+    uint8_t decrypted[AES_BLOCK_SIZE];
 
-    unsigned char encSubKeys[11][16];
-    unsigned char decSubKeys[11][16];
+    uint8_t encSubKeys[11][16];
+    uint8_t decSubKeys[11][16];
 
     // Generate encryption subkeys
     if (aes_make_enc_subkeys(key, encSubKeys) != 0)
